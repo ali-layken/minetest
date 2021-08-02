@@ -36,9 +36,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	#include <shlwapi.h>
 	#include <shellapi.h>
 #endif
+#if defined(__SWITCH__)
+#include "porting_switch.h"
+#endif
 #if !defined(_WIN32)
 	#include <unistd.h>
-	#include <sys/utsname.h>
+	#if !defined(__SWITCH__)
+		#include <sys/utsname.h>
+	#endif
 	#if !defined(__ANDROID__)
 		#include <spawn.h>
 	#endif
@@ -226,6 +231,8 @@ std::string get_sysinfo()
 	delete[] filePath;
 
 	return oss.str();
+#elif defined(__SWITCH__)
+	return "Horizon";
 #else
 	struct utsname osinfo;
 	uname(&osinfo);

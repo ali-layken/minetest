@@ -18,6 +18,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#ifndef  _SWITCH_
+#define _SWITCH_
+#undef _WIN32_
+#endif // !
+
+
 #include <IrrlichtDevice.h>
 #include "fontengine.h"
 #include "client.h"
@@ -37,7 +43,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "../gui/guiSkin.h"
 
 #if !defined(_WIN32) && !defined(__APPLE__) && !defined(__ANDROID__) && \
-		!defined(SERVER) && !defined(__HAIKU__)
+		!defined(SERVER) && !defined(__HAIKU__) && !defined(_SWITCH_)
 #define XORG_USED
 #endif
 #ifdef XORG_USED

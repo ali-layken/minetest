@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(GCC_MINIMUM_VERSION "4.8")
 set(CLANG_MINIMUM_VERSION "3.4")
 
+option(USE_SWITCH "Build targetting switch" ON)
+
 # Also remember to set PROTOCOL_VERSION in network/networkprotocol.h when releasing
 set(VERSION_MAJOR 5)
 set(VERSION_MINOR 5)
@@ -40,10 +42,15 @@ endif()
 set(RUN_IN_PLACE ${DEFAULT_RUN_IN_PLACE} CACHE BOOL
 	"Run directly in source directory structure")
 
+set(OPENGL_gl_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libglapi.a")
+set(SQLITE3_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include")
+set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib")
 
 set(BUILD_CLIENT TRUE CACHE BOOL "Build client")
 set(BUILD_SERVER FALSE CACHE BOOL "Build server")
 set(BUILD_UNITTESTS TRUE CACHE BOOL "Build unittests")
+
+include("/opt/devkitpro/portlibs/switch/lib/cmake/OpenAL/OpenALConfig.cmake")
 
 
 set(WARN_ALL TRUE CACHE BOOL "Enable -Wall for Release build")
@@ -93,6 +100,8 @@ endif()
 
 # Installation
 
+set(DOCDIR "doc")
+set(EXAMPLE_CONF_DIR ${DOCDIR})
 if(WIN32)
 	set(SHAREDIR ".")
 	set(BINDIR "bin")
