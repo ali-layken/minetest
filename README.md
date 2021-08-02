@@ -179,7 +179,7 @@ Download minetest_game (otherwise only the "Development Test" game is available)
 
 Download IrrlichtMt to `lib/irrlichtmt`, it will be used to satisfy the IrrlichtMt dependency that way:
 
-    git clone --depth 1 https://github.com/minetest/irrlicht.git lib/irrlichtmt
+    git clone --depth 1 https://github.com/emmauss/irrlicht.git lib/irrlichtmt
 
 Download source, without using Git:
 
