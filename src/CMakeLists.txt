@@ -270,7 +270,7 @@ if(WIN32)
 
 	# Zlib stuff
 	find_path(ZLIB_INCLUDE_DIR "zlib.h" DOC "Zlib include directory")
-	find_library(ZLIB_LIBRARIES "zlib" DOC "Path to zlib library")
+	find_library(ZLIB_LIBRARIES "zlib.la" DOC "Path to zlib library")
 
 	# Dll's are automatically copied to the output directory by vcpkg when VCPKG_APPLOCAL_DEPS=ON
 	if(NOT VCPKG_APPLOCAL_DEPS)
@@ -297,7 +297,7 @@ else()
 	endif()
 
 	find_package(ZLIB REQUIRED)
-	set(PLATFORM_LIBS -lpthread ${CMAKE_DL_LIBS})
+	set(PLATFORM_LIBS -lpthread)
 	if(APPLE)
 		set(PLATFORM_LIBS "-framework CoreFoundation" ${PLATFORM_LIBS})
 	else()
@@ -516,7 +516,7 @@ if(NOT CMAKE_CROSSCOMPILING)
 	set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
 endif()
 
-if(BUILD_CLIENT)
+if(BUILD_CLIENT)	
 	add_executable(${PROJECT_NAME} ${client_SRCS} ${extra_windows_SRCS})
 	add_dependencies(${PROJECT_NAME} GenerateVersion)
 	target_link_libraries(

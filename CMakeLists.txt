@@ -33,6 +33,7 @@ endif()
 
 message(STATUS "*** Will build version ${VERSION_STRING} ***")
 
+set(WIN32 FALSE)
 
 # Configuration options
 set(DEFAULT_RUN_IN_PLACE FALSE)
@@ -68,9 +69,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/irrlichtmt")
 	message(STATUS "Using user-provided IrrlichtMt at subdirectory 'lib/irrlichtmt'")
 	# tell IrrlichtMt to create a static library
-	set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared library" FORCE)
+	set(BUILD_SHARED_LIBS OFF)
 	add_subdirectory(lib/irrlichtmt EXCLUDE_FROM_ALL)
-	unset(BUILD_SHARED_LIBS CACHE)
 
 	if(NOT TARGET IrrlichtMt)
 		message(FATAL_ERROR "IrrlichtMt project is missing a CMake target?!")
@@ -90,8 +90,8 @@ else()
 			message(FATAL_ERROR "Irrlicht or IrrlichtMt headers are required to build the server, but none found.\n${explanation_msg}")
 		endif()
 		message(STATUS "Found Irrlicht headers: ${IRRLICHT_INCLUDE_DIR}")
-		add_library(IrrlichtMt::IrrlichtMt INTERFACE IMPORTED)
-		target_include_directories(IrrlichtMt::IrrlichtMt INTERFACE "${IRRLICHT_INCLUDE_DIR}")
+		add_library(IrrlichtMt::IrrlichtMt STATIC IMPORTED)
+		target_include_directories(IrrlichtMt::IrrlichtMt STATIC "${IRRLICHT_INCLUDE_DIR}")
 	else()
 		message(STATUS "Found IrrlichtMt ${IrrlichtMt_VERSION}")
 	endif()
