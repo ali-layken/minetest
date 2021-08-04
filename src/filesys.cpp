@@ -27,7 +27,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "log.h"
 #include "config.h"
 #include "porting.h"
+#include <switch.h>
 
+#undef _WIN32
 namespace fs
 {
 
@@ -286,46 +288,13 @@ bool IsDirDelimiter(char c)
 
 bool RecursiveDelete(const std::string &path)
 {
-	/*
-		Execute the 'rm' command directly, by fork() and execve()
-	*/
-
 	infostream<<"Removing \""<<path<<"\""<<std::endl;
 
-	pid_t child_pid = fork();
-
-	if(child_pid == 0)
-	{
-		// Child
-		const char *argv[4] = {
-#ifdef __ANDROID__
-			"/system/bin/rm",
-#else
-			"/bin/rm",
-#endif
-			"-rf",
-			path.c_str(),
-			NULL
-		};
-
-		verbosestream<<"Executing '"<<argv[0]<<"' '"<<argv[1]<<"' '"
-				<<argv[2]<<"'"<<std::endl;
-
-		execv(argv[0], const_cast<char**>(argv));
-
-		// Execv shouldn't return. Failed.
-		_exit(1);
-	}
-	else
-	{
-		// Parent
-		int child_status;
-		pid_t tpid;
-		do{
-			tpid = wait(&child_status);
-		}while(tpid != child_pid);
-		return (child_status == 0);
-	}
+	Result ret = 0;
+	FsFileSystem *fs = fsdevGetDeviceFileSystem("sdmc");
+	if (R_FAILED(ret = fsFsDeleteDirectoryRecursively(fs, path.c_str())))
+		return false;
+	return true;
 }
 
 bool DeleteSingleFileOrEmptyDirectory(const std::string &path)
@@ -654,15 +623,8 @@ std::string RemoveRelativePathComponents(std::string path)
 
 std::string AbsolutePath(const std::string &path)
 {
-#ifdef _WIN32
-	char *abs_path = _fullpath(NULL, path.c_str(), MAX_PATH);
-#else
-	char *abs_path = realpath(path.c_str(), NULL);
-#endif
-	if (!abs_path) return "";
-	std::string abs_path_str(abs_path);
-	free(abs_path);
-	return abs_path_str;
+	// TODO test
+	return path;
 }
 
 const char *GetFilenameFromPath(const char *path)

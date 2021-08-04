@@ -297,7 +297,7 @@ else()
 	endif()
 
 	find_package(ZLIB REQUIRED)
-	set(PLATFORM_LIBS -lpthread)
+	set(PLATFORM_LIBS -lpthread -lz)
 	if(APPLE)
 		set(PLATFORM_LIBS "-framework CoreFoundation" ${PLATFORM_LIBS})
 	else()
@@ -325,7 +325,6 @@ configure_file(
 	"${PROJECT_SOURCE_DIR}/cmake_config.h.in"
 	"${PROJECT_BINARY_DIR}/cmake_config.h"
 )
-
 
 # Add a target that always rebuilds cmake_config_githash.h
 add_custom_target(GenerateVersion
@@ -490,6 +489,7 @@ include_directories(
 	${ZLIB_INCLUDE_DIR}
 	${SOUND_INCLUDE_DIRS}
 	${SQLITE3_INCLUDE_DIR}
+	${GLAD_INCLUDE_DIR}
 	${LUA_INCLUDE_DIR}
 	${GMP_INCLUDE_DIR}
 	${JSON_INCLUDE_DIR}
@@ -573,6 +573,7 @@ if(BUILD_CLIENT)
 		target_link_libraries(
 			${PROJECT_NAME}
 			${FREETYPE_LIBRARY}
+			-lbz2
 		)
 	endif()
 	if (USE_CURSES)
@@ -595,6 +596,10 @@ if(BUILD_CLIENT)
 	endif()
 endif(BUILD_CLIENT)
 
+target_link_libraries(
+			${PROJECT_NAME}
+			-lbz2
+		)
 
 if(BUILD_SERVER)
 	add_executable(${PROJECT_NAME}server ${server_SRCS} ${extra_windows_SRCS})
