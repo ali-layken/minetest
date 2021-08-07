@@ -48,6 +48,10 @@ set(SQLITE3_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include")
 set(GLAD_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include/glad")
 set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libSQLite.a")
 
+find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
+  find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
+  find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+
 set(BUILD_CLIENT TRUE CACHE BOOL "Build client")
 set(BUILD_SERVER FALSE CACHE BOOL "Build server")
 set(BUILD_UNITTESTS TRUE CACHE BOOL "Build unittests")

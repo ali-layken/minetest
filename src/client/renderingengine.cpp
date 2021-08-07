@@ -67,8 +67,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 RenderingEngine *RenderingEngine::s_singleton = nullptr;
 
-SDL_Window* Window;
-SDL_GLContext Context;
 float g_native_scale_x = 1.0f;
 float g_native_scale_y = 1.0f;
 
@@ -93,113 +91,6 @@ static gui::GUISkin *createSkin(gui::IGUIEnvironment *environment,
 	return skin;
 }
 
-bool versionCorrect(int major, int minor)
-{
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-	return true;
-#else
-	int created_major = 2;
-	int created_minor = 0;
-	glGetIntegerv(GL_MAJOR_VERSION, &created_major);
-	glGetIntegerv(GL_MINOR_VERSION, &created_minor);
-	if (created_major > major || (created_major == major && created_minor >= minor))
-		return true;
-	return false;
-#endif
-}
-
-void tryCreateOpenGLContext(u32 flags)
-{
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, true);
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-	if (Context) {
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window) {
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("",
-			(float)0 / g_native_scale_x,
-			(float)0 / g_native_scale_y,
-			(float)1280 / g_native_scale_x,
-			(float)720 / g_native_scale_y,
-			flags);
-	if (Window) {
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGL() != 0 &&
-				versionCorrect(4, 3))
-			return;
-	}
-
-	if (Context) {
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window) {
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("", (float)0 / g_native_scale_x,
-			(float)0 / g_native_scale_y, (float)1280 / g_native_scale_x,
-			(float)720 / g_native_scale_y, flags);
-
-	if (Window) {
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGL() != 0 &&
-				versionCorrect(3, 3))
-			return;
-	}
-
-	if (Context) {
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window) {
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	Window = SDL_CreateWindow("", (float)0 / g_native_scale_x,
-			(float)0 / g_native_scale_y, (float)1280 / g_native_scale_x,
-			(float)720 / g_native_scale_y, flags);
-	if (Window) {
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGL() != 0 &&
-				versionCorrect(3, 1))
-			return;
-	}
-}
-
-bool createWindow()
-{
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
-	flags |= SDL_WINDOW_FULLSCREEN;
-
-	flags |= SDL_WINDOW_OPENGL;
-	tryCreateOpenGLContext(flags);
-	if (!Window || !Context) {
-		// os::Printer::log("Could not initialize display!");
-		return false;
-	}
-	return true;
-}
 
 RenderingEngine::RenderingEngine(IEventReceiver *receiver)
 {
@@ -225,17 +116,20 @@ RenderingEngine::RenderingEngine(IEventReceiver *receiver)
 	u32 i;
 	for (i = 0; i != drivers.size(); i++) {
 		if (!strcasecmp(driverstring.c_str(),
-				RenderingEngine::getVideoDriverInfo(drivers[i]).name.c_str())) {
+				    RenderingEngine::getVideoDriverInfo(drivers[i])
+						    .name.c_str())) {
 			driverType = drivers[i];
 			break;
 		}
 	}
+	dstream << "test 2" << std::endl;
 	if (i == drivers.size()) {
 		errorstream << "Invalid video_driver specified; "
 			       "defaulting to opengl"
 			    << std::endl;
 	}
 
+	dstream << "test 21" << std::endl;
 	SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
 	if (g_logger.getTraceEnabled())
 		params.LoggingLevel = irr::ELL_DEBUG;
@@ -253,22 +147,24 @@ RenderingEngine::RenderingEngine(IEventReceiver *receiver)
 #endif
 #if ENABLE_GLES
 	// there is no standardized path for these on desktop
-	std::string rel_path = std::string("client") + DIR_DELIM
-			+ "shaders" + DIR_DELIM + "Irrlicht";
-	params.OGLES2ShaderPath = (porting::path_share + DIR_DELIM + rel_path + DIR_DELIM).c_str();
+	std::string rel_path = std::string("client") + DIR_DELIM + "shaders" + DIR_DELIM +
+			       "Irrlicht";
+	params.OGLES2ShaderPath =
+			(porting::path_share + DIR_DELIM + rel_path + DIR_DELIM).c_str();
 #endif
 
-	if (createWindow()) {
-		m_device = createDeviceEx(params, *Window);
-		driver = m_device->getVideoDriver();
+	dstream << "test 3" << std::endl;
+	m_device = createDeviceEx(params);
+	dstream << "test 4" << std::endl;
+	driver = m_device->getVideoDriver();
 
-		s_singleton = this;
+	s_singleton = this;
 
-		auto skin = createSkin(m_device->getGUIEnvironment(),
-				gui::EGST_WINDOWS_METALLIC, driver);
-		m_device->getGUIEnvironment()->setSkin(skin);
-		skin->drop();
-	}
+	dstream << "test 5" << std::endl;
+	auto skin = createSkin(m_device->getGUIEnvironment(), gui::EGST_WINDOWS_METALLIC,
+			driver);
+	m_device->getGUIEnvironment()->setSkin(skin);
+	skin->drop();
 }
 
 RenderingEngine::~RenderingEngine()

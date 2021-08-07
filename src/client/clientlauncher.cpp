@@ -109,13 +109,13 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 		return false;
 	}
 
-	// Speed tests (done after irrlicht is loaded to get timer)
+	/*// Speed tests (done after irrlicht is loaded to get timer)
 	if (cmd_args.getFlag("speedtests")) {
 		dstream << "Running speed tests" << std::endl;
 		speed_tests();
 		return true;
 	}
-
+	*/
 	if (m_rendering_engine->get_video_driver() == NULL) {
 		errorstream << "Could not initialize video driver." << std::endl;
 		return false;
@@ -340,6 +340,7 @@ bool ClientLauncher::init_engine()
 {
 	receiver = new MyEventReceiver();
 	m_rendering_engine = new RenderingEngine(receiver);
+	dstream << "test 3" << std::endl;
 	return m_rendering_engine->get_raw_device() != nullptr;
 }
 

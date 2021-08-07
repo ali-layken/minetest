@@ -4,11 +4,11 @@ INCLUDE(CheckIncludeFiles)
 INCLUDE(CheckLibraryExists)
 
 # Add custom SemiDebug build mode
-set(CMAKE_CXX_FLAGS_SEMIDEBUG "-O1 -g -Wall" CACHE STRING
+set(CMAKE_CXX_FLAGS_SEMIDEBUG "-O1 -g2 -Wall" CACHE STRING
 	"Flags used by the C++ compiler during semidebug builds."
 	FORCE
 )
-set(CMAKE_C_FLAGS_SEMIDEBUG "-O1 -g -Wall -pedantic" CACHE STRING
+set(CMAKE_C_FLAGS_SEMIDEBUG "-O1 -g2 -Wall -pedantic" CACHE STRING
 	"Flags used by the C compiler during semidebug builds."
 	FORCE
 )
@@ -253,6 +253,7 @@ endif()
 # Use cmake_config.h
 add_definitions(-DUSE_CMAKE_CONFIG_H)
 
+add_compile_definitions(__SWITCH__)
 if(WIN32)
 	# Windows
 	if(MSVC) # MSVC Specifics
@@ -548,7 +549,10 @@ if(BUILD_CLIENT)
 	else()
 		target_link_libraries(
 			${PROJECT_NAME}
-			${OPENGL_LIBRARIES}
+			${OPENGL_LIBRARIES}			
+			${DRM_LIBRARY}
+			${GLAPI_LIBRARY}
+			${NX_LIBRARY}
 		)
 	endif()
 	if(USE_GETTEXT)
@@ -775,8 +779,8 @@ else()
 			set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MATH_FLAGS}")
 		endif()
 	endif()
-	set(CMAKE_CXX_FLAGS_SEMIDEBUG "-g -O1 -Wall ${WARNING_FLAGS} ${OTHER_FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall ${WARNING_FLAGS} ${OTHER_FLAGS}")
+	set(CMAKE_CXX_FLAGS_SEMIDEBUG "-g2 -O1 -Wall ${WARNING_FLAGS} ${OTHER_FLAGS}")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g2 -O0 -Wall ${WARNING_FLAGS} ${OTHER_FLAGS}")
 
 	if(USE_GPROF)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg")
@@ -786,7 +790,6 @@ else()
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows")
 	endif()
 endif()
-
 
 # Installation
 

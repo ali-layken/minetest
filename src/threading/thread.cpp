@@ -324,30 +324,6 @@ bool Thread::bindToProcessor(unsigned int proc_number)
 
 bool Thread::setPriority(int prio)
 {
-#ifdef _MSC_VER
-
-	return SetThreadPriority(getThreadHandle(), prio);
-
-#elif __MINGW32__
-
-	return SetThreadPriority(pthread_gethandle(getThreadHandle()), prio);
-#elif __SWITCH__
-	//svcSetThreadPriority(getThreadHandle(), prio);
-	return true;
-#else
-
-	struct sched_param sparam;
-	int policy;
-
-	if (pthread_getschedparam(getThreadHandle(), &policy, &sparam) != 0)
-		return false;
-
-	int min = sched_get_priority_min(policy);
-	int max = sched_get_priority_max(policy);
-
-	sparam.sched_priority = min + prio * (max - min) / THREAD_PRIORITY_HIGHEST;
-	return pthread_setschedparam(getThreadHandle(), policy, &sparam) == 0;
-
-#endif
+	return false;
 }
 
