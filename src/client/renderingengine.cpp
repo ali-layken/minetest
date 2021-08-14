@@ -63,7 +63,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "SDL.h"
 #include <SDL_video.h>
-#include "glad.h"
 
 RenderingEngine *RenderingEngine::s_singleton = nullptr;
 
@@ -97,12 +96,12 @@ RenderingEngine::RenderingEngine(IEventReceiver *receiver)
 	sanity_check(!s_singleton);
 
 	// Resolution selection
-	bool fullscreen = g_settings->getBool("fullscreen");
-	u16 screen_w = g_settings->getU16("screen_w");
-	u16 screen_h = g_settings->getU16("screen_h");
+	bool fullscreen = true;
+	u16 screen_w = 1280;
+	u16 screen_h = 720;
 
 	// bpp, fsaa, vsync
-	bool vsync = g_settings->getBool("vsync");
+	bool vsync = true;
 	u16 fsaa = g_settings->getU16("fsaa");
 
 	// stereo buffer required for pageflip stereo

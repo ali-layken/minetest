@@ -28,6 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/render/core.h"
 // include the shadow mapper classes too
 #include "client/shadows/dynamicshadowsrender.h"
+#include <glad/gl.h>
 
 struct VideoDriverInfo {
 	std::string name;

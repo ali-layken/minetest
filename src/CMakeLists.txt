@@ -93,17 +93,24 @@ set(USE_SOUND FALSE)
 
 if(BUILD_CLIENT AND ENABLE_SOUND)
 	# Sound libraries
-	find_package(OpenAL)
-	find_package(Vorbis)
-	if(NOT OPENAL_FOUND)
+	find_package(OpenAL REQUIRED)
+        # Unclear why this happens, but on switch OPENAL_LIBRARY never set!
+        if (NOT OPENAL_LIBRARY)
+            find_library(OPENAL_LIBRARY NAMES al OpenAL AL openal REQUIRED)
+        endif()
+        if (NOT OPENAL_INCLUDE_DIR)
+            find_path(OPENAL_INCLUDE_DIR NAMES AL/al.h REQUIRED)
+        endif()	
+	include(../cmake/FindOggVorbis.cmake)
+	if(NOT OPENAL_LIBRARY)
 		message(STATUS "Sound enabled, but OpenAL not found!")
 		mark_as_advanced(CLEAR OPENAL_LIBRARY OPENAL_INCLUDE_DIR)
 	endif()
-	if(NOT VORBIS_FOUND)
+	if(NOT VORBIS_LIBRARY)
 		message(STATUS "Sound enabled, but Vorbis libraries not found!")
 		mark_as_advanced(CLEAR OGG_INCLUDE_DIR VORBIS_INCLUDE_DIR OGG_LIBRARY VORBIS_LIBRARY VORBISFILE_LIBRARY)
 	endif()
-	if(OPENAL_FOUND AND VORBIS_FOUND)
+	if(OPENAL_LIBRARY AND VORBIS_LIBRARY)
 		set(USE_SOUND TRUE)
 		message(STATUS "Sound enabled.")
 	else()
@@ -254,6 +261,8 @@ endif()
 add_definitions(-DUSE_CMAKE_CONFIG_H)
 
 add_compile_definitions(__SWITCH__)
+add_compile_definitions(HAVE_TOUCHSCREENGUI)
+
 if(WIN32)
 	# Windows
 	if(MSVC) # MSVC Specifics
@@ -490,7 +499,7 @@ include_directories(
 	${ZLIB_INCLUDE_DIR}
 	${SOUND_INCLUDE_DIRS}
 	${SQLITE3_INCLUDE_DIR}
-	${GLAD_INCLUDE_DIR}
+	${PORTLIB_INCLUDE_DIR}
 	${LUA_INCLUDE_DIR}
 	${GMP_INCLUDE_DIR}
 	${JSON_INCLUDE_DIR}
@@ -517,14 +526,30 @@ if(NOT CMAKE_CROSSCOMPILING)
 	set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
 endif()
 
-if(BUILD_CLIENT)	
+if(BUILD_CLIENT)
+	include(../cmake/FindEGL.cmake)
+	  find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
+	  find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
+	  find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+	  find_library(ZLIB_LIBRARY NAMES z libz REQUIRED)
+	  find_library(PNG_LIBRARY NAMES png libpng REQUIRED)
+	  find_library(BZ2_LIBRARY NAMES bz2 libbz2 REQUIRED)
 	add_executable(${PROJECT_NAME} ${client_SRCS} ${extra_windows_SRCS})
 	add_dependencies(${PROJECT_NAME} GenerateVersion)
 	target_link_libraries(
 		${PROJECT_NAME}
-		${ZLIB_LIBRARIES}
 		IrrlichtMt::IrrlichtMt
+		${SDL2_LIBRARY}
+		${ZLIB_LIBRARIES}
+		${OPENGL_gl_LIBRARY}
+		${DRM_LIBRARY}
+		${GLAPI_LIBRARY}
+		${NX_LIBRARY}
 		${X11_LIBRARIES}
+		${OPENAL_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
+		${OGG_LIBRARY}
 		${SOUND_LIBRARIES}
 		${SQLITE3_LIBRARY}
 		${LUA_LIBRARY}
@@ -539,22 +564,7 @@ if(BUILD_CLIENT)
 			ENABLE_EXPORTS 1
 		)
 	endif()
-
-	if(ENABLE_GLES)
-		target_link_libraries(
-			${PROJECT_NAME}
-			${OPENGLES2_LIBRARIES}
-			${EGL_LIBRARIES}
-		)
-	else()
-		target_link_libraries(
-			${PROJECT_NAME}
-			${OPENGL_LIBRARIES}			
-			${DRM_LIBRARY}
-			${GLAPI_LIBRARY}
-			${NX_LIBRARY}
-		)
-	endif()
+	
 	if(USE_GETTEXT)
 		target_link_libraries(
 			${PROJECT_NAME}

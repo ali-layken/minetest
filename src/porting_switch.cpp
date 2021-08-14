@@ -39,4 +39,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 namespace porting {
+
+float getDisplayDensity()
+{
+	return 209;
+}
+
+v2u32 getDisplaySize()
+{
+	return v2u32(1280, 720);
+}
 }

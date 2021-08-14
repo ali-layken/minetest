@@ -45,8 +45,9 @@ set(RUN_IN_PLACE ${DEFAULT_RUN_IN_PLACE} CACHE BOOL
 
 set(OPENGL_gl_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libglapi.a")
 set(SQLITE3_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include")
-set(GLAD_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include/glad")
+set(PORTLIB_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include/")
 set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libSQLite.a")
+include(FindPkgConfig)
 
 find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
   find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)

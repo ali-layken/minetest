@@ -357,3 +357,6 @@ bool open_directory(const std::string &path);
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
+#ifdef __SWITCH__
+#include "porting_switch.h"
+#endif
