@@ -121,6 +121,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 		return false;
 	}
 
+	dstream << "test 7" << std::endl;
 	m_rendering_engine->setupTopLevelWindow(PROJECT_NAME_C);
 
 	/*
@@ -134,13 +135,17 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 
 	m_rendering_engine->setResizable(true);
 
+	dstream << "test 8" << std::endl;
 	init_input();
 
+	dstream << "test 9" << std::endl;
 	m_rendering_engine->get_scene_manager()->getParameters()->
 		setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);
 
+	dstream << "test 10" << std::endl;
 	guienv = m_rendering_engine->get_gui_env();
 	skin = guienv->getSkin();
+	dstream << "test 11" << std::endl;
 	skin->setColor(gui::EGDC_BUTTON_TEXT, video::SColor(255, 255, 255, 255));
 	skin->setColor(gui::EGDC_3D_LIGHT, video::SColor(0, 0, 0, 0));
 	skin->setColor(gui::EGDC_3D_HIGH_LIGHT, video::SColor(255, 30, 30, 30));
@@ -171,18 +176,34 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 		}
 	}
 #endif
+#ifdef HAVE_TOUCHSCREENGUI
+	dstream << "Touch Screen Gui enabled" << std::endl;
+#endif
+	dstream << "test 12" << std::endl;
 	g_fontengine = new FontEngine(guienv);
 	FATAL_ERROR_IF(g_fontengine == NULL, "Font engine creation failed.");
 
+	dstream << "test 13" << std::endl;
 	// Irrlicht 1.8 input colours
 	skin->setColor(gui::EGDC_EDITABLE, video::SColor(255, 128, 128, 128));
 	skin->setColor(gui::EGDC_FOCUSED_EDITABLE, video::SColor(255, 96, 134, 49));
 
+	dstream << "test 14" << std::endl;
+
+	if (m_rendering_engine->get_scene_manager())
+		dstream << "sm exist" << std::endl;
+	if (!m_rendering_engine->get_scene_manager())
+		dstream << "sm not exist" << std::endl;
+
 	// Create the menu clouds
 	if (!g_menucloudsmgr)
-		g_menucloudsmgr = m_rendering_engine->get_scene_manager()->createNewSceneManager();
+		g_menucloudsmgr = m_rendering_engine->get_scene_manager()
+						  ->createNewSceneManager();
+	dstream << "test 15" << std::endl;
 	if (!g_menuclouds)
 		g_menuclouds = new Clouds(g_menucloudsmgr, -1, rand());
+
+	dstream << "test 16" << std::endl;
 	g_menuclouds->setHeight(100.0f);
 	g_menuclouds->update(v3f(0, 0, 0), video::SColor(255, 240, 240, 255));
 	scene::ICameraSceneNode* camera;
@@ -208,6 +229,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 	bool retval = true;
 	bool *kill = porting::signal_handler_killstatus();
 
+	dstream << "Starting Mai Loop" << std::endl;
 	while (m_rendering_engine->run() && !*kill &&
 		!g_gamecallback->shutdown_requested) {
 		// Set the window caption
@@ -256,14 +278,20 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 				break;
 			}
 
+			dstream << "Conf Path " << g_settings_path.c_str() << std::endl;
+
 			m_rendering_engine->get_video_driver()->setTextureCreationFlag(
 					video::ETCF_CREATE_MIP_MAPS, g_settings->getBool("mip_map"));
 
 #ifdef HAVE_TOUCHSCREENGUI
-			receiver->m_touchscreengui = new TouchScreenGUI(m_rendering_engine->get_raw_device(), receiver);
+			dstream << "Creating Touch Screen Gui" << std::endl;
+			receiver->m_touchscreengui = new TouchScreenGUI(
+					m_rendering_engine->get_raw_device(), receiver);
+			dstream << "Touch Screen Gui created" << std::endl;
 			g_touchscreengui = receiver->m_touchscreengui;
 #endif
 
+			dstream << "Starting Game" << std::endl;
 			the_game(
 				kill,
 				input,
@@ -340,7 +368,7 @@ bool ClientLauncher::init_engine()
 {
 	receiver = new MyEventReceiver();
 	m_rendering_engine = new RenderingEngine(receiver);
-	dstream << "test 3" << std::endl;
+	dstream << "test 6" << std::endl;
 	return m_rendering_engine->get_raw_device() != nullptr;
 }
 

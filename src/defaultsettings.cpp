@@ -465,7 +465,7 @@ void set_default_settings()
 #endif
 
 	// Altered settings for Android
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	settings->setDefault("screen_w", "0");
 	settings->setDefault("screen_h", "0");
 	settings->setDefault("fullscreen", "true");

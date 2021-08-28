@@ -18,7 +18,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #pragma once
-
+#ifndef __SWITCH__
+#define __SWITCH__
+#endif
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
 #include "irrlichttypes_extrabloated.h"
 #include "irr_ptr.h"
 #include "util/string.h"
@@ -74,7 +79,7 @@ protected:
 	v2s32 m_old_pointer;  // Mouse position after previous mouse event
 	v2u32 m_screensize_old;
 	float m_gui_scale;
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	v2s32 m_down_pos;
 	std::string m_jni_field_name;
 #endif
@@ -102,7 +107,7 @@ private:
 	// wants to launch other menus
 	bool m_allow_focus_removal = false;
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	irr_ptr<gui::IGUIElement> m_hovered;
 
 	bool simulateMouseEvent(gui::IGUIElement *target, ETOUCH_INPUT_EVENT touch_event);

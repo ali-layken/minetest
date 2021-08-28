@@ -18,7 +18,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #include "game.h"
-
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
 #include <iomanip>
 #include <cmath>
 #include "client/renderingengine.h"

@@ -23,7 +23,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gettext.h"
 #include "porting.h"
 #include "settings.h"
-
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
 #ifdef HAVE_TOUCHSCREENGUI
 #include "touchscreengui.h"
 #endif
@@ -33,14 +35,16 @@ GUIModalMenu::GUIModalMenu(gui::IGUIEnvironment* env, gui::IGUIElement* parent,
 	s32 id, IMenuManager *menumgr, bool remap_dbl_click) :
 		IGUIElement(gui::EGUIET_ELEMENT, env, parent, id,
 				core::rect<s32>(0, 0, 100, 100)),
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 		m_jni_field_name(""),
 #endif
 		m_menumgr(menumgr),
 		m_remap_dbl_click(remap_dbl_click)
 {
+	
+	dstream << "Create modal menu" << std::endl;
 	m_gui_scale = g_settings->getFloat("gui_scaling");
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	float d = porting::getDisplayDensity();
 	m_gui_scale *= 1.1 - 0.3 * d + 0.2 * d * d;
 #endif
@@ -183,15 +187,19 @@ static bool isChild(gui::IGUIElement *tocheck, gui::IGUIElement *parent)
 	return false;
 }
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 
 bool GUIModalMenu::simulateMouseEvent(
 		gui::IGUIElement *target, ETOUCH_INPUT_EVENT touch_event)
 {
+
+	dstream << "Simulate Mouse Event" << std::endl;
 	SEvent mouse_event{}; // value-initialized, not unitialized
 	mouse_event.EventType = EET_MOUSE_INPUT_EVENT;
 	mouse_event.MouseInput.X = m_pointer.X;
 	mouse_event.MouseInput.Y = m_pointer.Y;
+	dstream << "X: " << m_pointer.X << std::endl;
+	dstream << "Y: " << m_pointer.Y << std::endl;
 	switch (touch_event) {
 	case ETIE_PRESSED_DOWN:
 		mouse_event.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
@@ -243,7 +251,7 @@ void GUIModalMenu::leave()
 
 bool GUIModalMenu::preprocessEvent(const SEvent &event)
 {
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	// clang-format off
 	// display software keyboard when clicking edit boxes
 	if (event.EventType == EET_MOUSE_INPUT_EVENT &&
@@ -281,13 +289,16 @@ bool GUIModalMenu::preprocessEvent(const SEvent &event)
 			if (((gui::IGUIEditBox *)hovered)->isPasswordBox())
 				type = 3;
 
-			porting::showInputDialog(gettext("OK"), "",
-				wide_to_utf8(((gui::IGUIEditBox *)hovered)->getText()), type);
+			/*porting::showInputDialog(gettext("OK"), "",
+				wide_to_utf8(((gui::IGUIEditBox *)hovered)->getText()), type);*/
 			return retval;
 		}
 	}
 
 	if (event.EventType == EET_TOUCH_INPUT_EVENT) {
+		
+		dstream << "Get Touch Event" << std::endl;
+    	dstream << "Touch Count " << (int)event.TouchInput.touchedCount << std::endl;
 		irr_ptr<GUIModalMenu> holder;
 		holder.grab(this); // keep this alive until return (it might be dropped downstream [?])
 

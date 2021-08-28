@@ -47,6 +47,7 @@ Clouds::Clouds(scene::ISceneManager* mgr,
 	scene::ISceneNode(mgr->getRootSceneNode(), mgr, id),
 	m_seed(seed)
 {
+	dstream << "creating clouds" << std::endl;
 	m_material.setFlag(video::EMF_LIGHTING, false);
 	//m_material.setFlag(video::EMF_BACK_FACE_CULLING, false);
 	m_material.setFlag(video::EMF_BACK_FACE_CULLING, true);

@@ -109,6 +109,7 @@ enum RunCallbacksMode
 };
 
 std::string script_get_backtrace(lua_State *L);
+void luaL_traceback(lua_State *L, lua_State *L1, const char *msg, int level);
 int script_exception_wrapper(lua_State *L, lua_CFunction f);
 void script_error(lua_State *L, int pcall_result, const char *mod, const char *fxn);
 void script_run_callbacks_f(lua_State *L, int nargs,

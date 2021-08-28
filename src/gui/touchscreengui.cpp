@@ -421,13 +421,20 @@ TouchScreenGUI::TouchScreenGUI(IrrlichtDevice *device, IEventReceiver *receiver)
 		button.repeatdelay   = BUTTON_REPEAT_DELAY;
 	}
 
+	dstream << "Test 20" << std::endl;
 	m_touchscreen_threshold = g_settings->getU16("touchscreen_threshold");
+	dstream << "Test 20 a" << std::endl;
 	m_fixed_joystick = g_settings->getBool("fixed_virtual_joystick");
+	dstream << "Test 20 b" << std::endl;
 	m_joystick_triggers_aux1 = g_settings->getBool("virtual_joystick_triggers_aux1");
+	dstream << "Test 21" << std::endl;
 	m_screensize = m_device->getVideoDriver()->getScreenSize();
+	dstream << "Test 22" << std::endl;
 	button_size = MYMIN(m_screensize.Y / 4.5f,
 			porting::getDisplayDensity() *
 			g_settings->getFloat("hud_scaling") * 65.0f);
+
+	dstream << "Test 23" << std::endl;
 }
 
 void TouchScreenGUI::initButton(touch_gui_button_id id, const rect<s32> &button_rect,
@@ -726,6 +733,8 @@ void TouchScreenGUI::translateEvent(const SEvent &event)
 			<< std::endl;
 		return;
 	}
+
+	dstream << "Translate Touch event" << std::endl;
 
 	if (event.EventType != EET_TOUCH_INPUT_EVENT)
 		return;

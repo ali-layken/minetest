@@ -47,12 +47,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gui/guiEngine.h"
 #include "gui/mainmenumanager.h"
 #endif
-#ifdef HAVE_TOUCHSCREENGUI
-	#include "gui/touchscreengui.h"
+#ifndef __SWITCH__
+#define __SWITCH__
 #endif
 
-#ifndef __SWITCH__
-#define __SWITCH_
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
+
+#ifdef HAVE_TOUCHSCREENGUI
+	#include "gui/touchscreengui.h"
 #endif
 
 #ifdef __SWITCH__

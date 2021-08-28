@@ -37,7 +37,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "wieldmesh.h"
 #include "client/renderingengine.h"
 #include "client/minimap.h"
-
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
 #ifdef HAVE_TOUCHSCREENGUI
 #include "gui/touchscreengui.h"
 #endif

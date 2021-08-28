@@ -677,9 +677,14 @@ bool safeWriteToFile(const std::string &path, const std::string &content)
 	// file in place of the destination file, making this a truly error-proof
 	// transaction.
 	rename_success = rename(tmp_file.c_str(), path.c_str()) == 0;
+
+	if (errno == 17) {
+		remove(path.c_str());		
+	    rename_success = rename(tmp_file.c_str(), path.c_str()) == 0;
+	}
 #endif
 	if (!rename_success) {
-		warningstream << "Failed to write to file: " << path.c_str() << std::endl;
+		warningstream << "Failed to write to file: " << path.c_str() << ". Error: " << errno << std::endl;
 		// Remove the temporary file because moving it over the target file
 		// failed.
 		remove(tmp_file.c_str());
