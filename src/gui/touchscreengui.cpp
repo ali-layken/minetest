@@ -412,7 +412,9 @@ TouchScreenGUI::TouchScreenGUI(IrrlichtDevice *device, ISimpleTextureSource *tsr
 	m_touchscreen_threshold = g_settings->getU16("touchscreen_threshold");
 	m_long_tap_delay = g_settings->getU16("touch_long_tap_delay");
 	m_fixed_joystick = g_settings->getBool("fixed_virtual_joystick");
+	dstream << "Test 20 b" << std::endl;
 	m_joystick_triggers_aux1 = g_settings->getBool("virtual_joystick_triggers_aux1");
+	dstream << "Test 21" << std::endl;
 	m_screensize = m_device->getVideoDriver()->getScreenSize();
 	m_button_size = MYMIN(m_screensize.Y / 4.5f,
 			RenderingEngine::getDisplayDensity() * 65.0f *
@@ -617,6 +619,8 @@ void TouchScreenGUI::translateEvent(const SEvent &event)
 				<< std::endl;
 		return;
 	}
+
+	dstream << "Translate Touch event" << std::endl;
 
 	if (event.EventType != EET_TOUCH_INPUT_EVENT)
 		return;

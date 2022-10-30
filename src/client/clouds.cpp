@@ -49,6 +49,7 @@ Clouds::Clouds(scene::ISceneManager* mgr, IShaderSource *ssrc,
 	scene::ISceneNode(mgr->getRootSceneNode(), mgr, id),
 	m_seed(seed)
 {
+	dstream << "creating clouds" << std::endl;
 	m_enable_shaders = g_settings->getBool("enable_shaders");
 	// menu clouds use shader-less clouds for simplicity (ssrc == NULL)
 	m_enable_shaders = m_enable_shaders && ssrc;

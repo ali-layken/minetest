@@ -15,11 +15,11 @@ if(SIZEOF_SIZE_T LESS 4)
 endif()
 
 # Add custom SemiDebug build mode
-set(CMAKE_CXX_FLAGS_SEMIDEBUG "-O1 -g -Wall" CACHE STRING
+set(CMAKE_CXX_FLAGS_SEMIDEBUG "-O1 -g2 -Wall" CACHE STRING
 	"Flags used by the C++ compiler during semidebug builds."
 	FORCE
 )
-set(CMAKE_C_FLAGS_SEMIDEBUG "-O1 -g -Wall -pedantic" CACHE STRING
+set(CMAKE_C_FLAGS_SEMIDEBUG "-O1 -g2 -Wall -pedantic" CACHE STRING
 	"Flags used by the C compiler during semidebug builds."
 	FORCE
 )
@@ -131,17 +131,24 @@ set(USE_SOUND FALSE)
 
 if(BUILD_CLIENT AND ENABLE_SOUND)
 	# Sound libraries
-	find_package(OpenAL)
-	find_package(Vorbis)
-	if(NOT OPENAL_FOUND)
+	find_package(OpenAL REQUIRED)
+        # Unclear why this happens, but on switch OPENAL_LIBRARY never set!
+        if (NOT OPENAL_LIBRARY)
+            find_library(OPENAL_LIBRARY NAMES al OpenAL AL openal REQUIRED)
+        endif()
+        if (NOT OPENAL_INCLUDE_DIR)
+            find_path(OPENAL_INCLUDE_DIR NAMES AL/al.h REQUIRED)
+        endif()	
+	include(../cmake/FindOggVorbis.cmake)
+	if(NOT OPENAL_LIBRARY)
 		message(STATUS "Sound enabled, but OpenAL not found!")
 		mark_as_advanced(CLEAR OPENAL_LIBRARY OPENAL_INCLUDE_DIR)
 	endif()
-	if(NOT VORBIS_FOUND)
+	if(NOT VORBIS_LIBRARY)
 		message(STATUS "Sound enabled, but Vorbis libraries not found!")
 		mark_as_advanced(CLEAR OGG_INCLUDE_DIR VORBIS_INCLUDE_DIR OGG_LIBRARY VORBIS_LIBRARY VORBISFILE_LIBRARY)
 	endif()
-	if(OPENAL_FOUND AND VORBIS_FOUND)
+	if(OPENAL_LIBRARY AND VORBIS_LIBRARY)
 		set(USE_SOUND TRUE)
 		message(STATUS "Sound enabled.")
 	else()
@@ -271,6 +278,9 @@ endif()
 # Use cmake_config.h
 add_definitions(-DUSE_CMAKE_CONFIG_H)
 
+add_compile_definitions(__SWITCH__)
+add_compile_definitions(HAVE_TOUCHSCREENGUI)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 set(PLATFORM_LIBS Threads::Threads)
@@ -289,6 +299,9 @@ if(WIN32)
 	set(PLATFORM_LIBS ws2_32.lib version.lib shlwapi.lib winmm.lib ${PLATFORM_LIBS})
 
 	set(EXTRA_DLL "" CACHE FILEPATH "Optional paths to additional DLLs that should be packaged")
+	# Zlib stuff
+	find_path(ZLIB_INCLUDE_DIR "zlib.h" DOC "Zlib include directory")
+	find_library(ZLIB_LIBRARIES "zlib.la" DOC "Path to zlib library")
 
 	# DLLs are automatically copied to the output directory by vcpkg when VCPKG_APPLOCAL_DEPS=ON
 	if(NOT VCPKG_APPLOCAL_DEPS)
@@ -314,6 +327,8 @@ if(WIN32)
 else()
 	# Unix probably
 	set(PLATFORM_LIBS ${PLATFORM_LIBS} ${CMAKE_DL_LIBS})
+	if(SWITCH)
+		set(PLATFORM_LIBS ${PLATFORM_LIBS}  -lpthread -lz)
 	if(APPLE)
 		set(PLATFORM_LIBS "-framework CoreFoundation" ${PLATFORM_LIBS})
 	else()
@@ -367,7 +382,6 @@ configure_file(
 	"${PROJECT_SOURCE_DIR}/cmake_config.h.in"
 	"${PROJECT_BINARY_DIR}/cmake_config.h"
 )
-
 
 # Add a target that always rebuilds cmake_config_githash.h
 add_custom_target(GenerateVersion
@@ -550,6 +564,7 @@ include_directories(SYSTEM
 	${ZLIB_INCLUDE_DIR}
 	${ZSTD_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
+	${PORTLIB_INCLUDE_DIR}
 	${LUA_INCLUDE_DIR}
 	${GMP_INCLUDE_DIR}
 	${JSON_INCLUDE_DIR}
@@ -584,15 +599,33 @@ endif()
 if(BUILD_CLIENT)
 	if(ANDROID)
 		add_library(${PROJECT_NAME} SHARED ${client_SRCS})
+	if(SWITCH)
+		include(../cmake/FindEGL.cmake)
+		find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
+		find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
+		find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+		find_library(ZLIB_LIBRARY NAMES z libz REQUIRED)
+		find_library(PNG_LIBRARY NAMES png libpng REQUIRED)
+		find_library(BZ2_LIBRARY NAMES bz2 libbz2 REQUIRED)
 	else()
 		add_executable(${PROJECT_NAME} ${client_SRCS} ${extra_windows_SRCS})
 	endif()
 	add_dependencies(${PROJECT_NAME} GenerateVersion)
 	target_link_libraries(
 		${PROJECT_NAME}
-		${ZLIB_LIBRARIES}
 		IrrlichtMt::IrrlichtMt
 		${ZSTD_LIBRARY}
+		${SDL2_LIBRARY}
+		${ZLIB_LIBRARIES}
+		${OPENGL_gl_LIBRARY}
+		${DRM_LIBRARY}
+		${GLAPI_LIBRARY}
+		${NX_LIBRARY}
+		${X11_LIBRARIES}
+		${OPENAL_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
+		${OGG_LIBRARY}
 		${SOUND_LIBRARIES}
 		${SQLITE3_LIBRARY}
 		${LUA_LIBRARY}
@@ -631,6 +664,18 @@ if(BUILD_CLIENT)
 			PROPERTIES
 			COMPILE_FLAGS "${FREETYPE_CFLAGS_STR}"
 	)
+	elseif(USE_FREETYPE)
+		if(FREETYPE_PKGCONFIG_FOUND)
+			set_target_properties(${PROJECT_NAME}
+				PROPERTIES
+				COMPILE_FLAGS "${FREETYPE_CFLAGS_STR}"
+			)
+		endif()
+		target_link_libraries(
+			${PROJECT_NAME}
+			${FREETYPE_LIBRARY}
+			-lbz2
+		)
 	endif()
 	if (USE_CURSES)
 		target_link_libraries(${PROJECT_NAME} ${CURSES_LIBRARIES})
@@ -659,6 +704,10 @@ if(BUILD_CLIENT)
 	endif()
 endif(BUILD_CLIENT)
 
+target_link_libraries(
+			${PROJECT_NAME}
+			-lbz2
+		)
 
 if(BUILD_SERVER)
 	add_executable(${PROJECT_NAME}server ${server_SRCS} ${extra_windows_SRCS})
@@ -873,7 +922,6 @@ else()
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-mwindows")
 	endif()
 endif()
-
 
 # Installation
 

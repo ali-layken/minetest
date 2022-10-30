@@ -53,7 +53,7 @@ GUIModalMenu::GUIModalMenu(gui::IGUIEnvironment* env, gui::IGUIElement* parent,
 	s32 id, IMenuManager *menumgr, bool remap_click_outside) :
 		IGUIElement(gui::EGUIET_ELEMENT, env, parent, id,
 				core::rect<s32>(0, 0, 100, 100)),
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 		m_jni_field_name(""),
 #endif
 		m_menumgr(menumgr),
@@ -187,6 +187,8 @@ bool GUIModalMenu::simulateMouseEvent(ETOUCH_INPUT_EVENT touch_event, bool secon
 	mouse_event.EventType = EET_MOUSE_INPUT_EVENT;
 	mouse_event.MouseInput.X = m_pointer.X;
 	mouse_event.MouseInput.Y = m_pointer.Y;
+	dstream << "X: " << m_pointer.X << std::endl;
+	dstream << "Y: " << m_pointer.Y << std::endl;
 	switch (touch_event) {
 	case ETIE_PRESSED_DOWN:
 		mouse_event.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
@@ -258,7 +260,8 @@ void GUIModalMenu::leave()
 
 bool GUIModalMenu::preprocessEvent(const SEvent &event)
 {
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
+	// clang-format off
 	// display software keyboard when clicking edit boxes
 	if (event.EventType == EET_MOUSE_INPUT_EVENT &&
 			event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN &&
@@ -326,6 +329,9 @@ bool GUIModalMenu::preprocessEvent(const SEvent &event)
 
 	// Convert touch events into mouse events.
 	if (event.EventType == EET_TOUCH_INPUT_EVENT) {
+		
+		dstream << "Get Touch Event" << std::endl;
+    	dstream << "Touch Count " << (int)event.TouchInput.touchedCount << std::endl;
 		irr_ptr<GUIModalMenu> holder;
 		holder.grab(this); // keep this alive until return (it might be dropped downstream [?])
 

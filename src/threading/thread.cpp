@@ -337,7 +337,7 @@ bool Thread::setPriority(int prio)
 	return SetThreadPriority(win32_native_handle(), prio);
 #elif __SWITCH__
 	// svcSetThreadPriority(getThreadHandle(), prio);
-	return true;
+	return false;
 #else
 
 	struct sched_param sparam;

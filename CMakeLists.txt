@@ -31,6 +31,8 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
 	set(VERSION_STRING "${VERSION_STRING}-debug")
 endif()
 
+set(WIN32 FALSE)
+
 # Configuration options
 set(BUILD_CLIENT TRUE CACHE BOOL "Build client")
 set(BUILD_SERVER FALSE CACHE BOOL "Build server")
@@ -66,7 +68,13 @@ set(RUN_IN_PLACE ${DEFAULT_RUN_IN_PLACE} CACHE BOOL
 
 set(OPENGL_gl_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libglapi.a")
 set(SQLITE3_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include")
-set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib")
+set(PORTLIB_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include/")
+set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libSQLite.a")
+include(FindPkgConfig)
+
+find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
+  find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
+  find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
 
 include("/opt/devkitpro/portlibs/switch/lib/cmake/OpenAL/OpenALConfig.cmake")
 
@@ -143,7 +151,13 @@ endif()
 
 set(DOCDIR "doc")
 set(EXAMPLE_CONF_DIR ${DOCDIR})
-if(WIN32)
+if(USE_SWITCH)
+	set(SHAREDIR ".")
+	set(BINDIR "bin")
+	set(DOCDIR "doc")
+	set(EXAMPLE_CONF_DIR ".")
+	set(LOCALEDIR "locale")
+elseif(WIN32)
 	set(SHAREDIR ".")
 	set(BINDIR "bin")
 	set(DOCDIR "doc")

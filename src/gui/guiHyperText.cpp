@@ -16,8 +16,14 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+<<<<<<< HEAD
 
 #include "guiHyperText.h"
+#ifdef __SWITCH__
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
+#endif
 #include "guiScrollBar.h"
 #include "client/fontengine.h"
 #include "IVideoDriver.h"

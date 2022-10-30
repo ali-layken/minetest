@@ -33,11 +33,6 @@
 #define LUA_WIN
 #endif
 
-#if defined(LUA_USE_LINUX)
-#define LUA_USE_POSIX
-#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
-#define LUA_USE_READLINE	/* needs some extra libraries */
-#endif
 
 #if defined(LUA_USE_MACOSX)
 #define LUA_USE_POSIX
@@ -705,9 +700,7 @@ union luai_Cast { double l_d; long l_l; };
 ** options.
 ** By default, _WIN32 gets LUA_DL_DLL and MAC OS X gets LUA_DL_DYLD.
 */
-#if defined(LUA_USE_DLOPEN)
-#define LUA_DL_DLOPEN
-#endif
+
 
 #if defined(LUA_WIN)
 #define LUA_DL_DLL

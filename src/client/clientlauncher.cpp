@@ -115,7 +115,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 		errorstream << "Could not initialize video driver." << std::endl;
 		return false;
 	}
-
+	dstream << "test 7" << std::endl;
 	m_rendering_engine->setupTopLevelWindow();
 
 	// Create game callback for menus
@@ -123,17 +123,27 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 
 	m_rendering_engine->setResizable(true);
 
+	dstream << "test 8" << std::endl;
 	init_input();
 
+	dstream << "test 9" << std::endl;
 	m_rendering_engine->get_scene_manager()->getParameters()->
 		setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);
 
+	dstream << "test 10" << std::endl;
 	guienv = m_rendering_engine->get_gui_env();
 	config_guienv();
 	g_settings->registerChangedCallback("dpi_change_notifier", setting_changed_callback, this);
 	g_settings->registerChangedCallback("gui_scaling", setting_changed_callback, this);
 
 	g_fontengine = new FontEngine(guienv);
+
+	dstream << "test 14" << std::endl;
+
+	if (m_rendering_engine->get_scene_manager())
+		dstream << "sm exist" << std::endl;
+	if (!m_rendering_engine->get_scene_manager())
+		dstream << "sm not exist" << std::endl;
 
 	// Create the menu clouds
 	// This is only global so it can be used by RenderingEngine::draw_load_screen().
@@ -165,6 +175,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 	bool retval = true;
 	bool *kill = porting::signal_handler_killstatus();
 
+	dstream << "Starting Mai Loop" << std::endl;
 	while (m_rendering_engine->run() && !*kill &&
 		!g_gamecallback->shutdown_requested) {
 		// Set the window caption
@@ -211,6 +222,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 			if (!m_rendering_engine->run() || *kill)
 				break;
 
+			dstream << "Starting Game" << std::endl;
 			the_game(
 				kill,
 				input,

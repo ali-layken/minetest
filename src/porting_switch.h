@@ -27,4 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 
 namespace porting {
+#ifndef SERVER
+float getDisplayDensity();
+v2u32 getDisplaySize();
+#endif
 }

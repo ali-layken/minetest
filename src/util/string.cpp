@@ -32,6 +32,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <codecvt>
+#include <string>
 
 #ifndef _WIN32
 	#include <iconv.h>

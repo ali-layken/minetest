@@ -547,7 +547,7 @@ void set_default_settings()
 	settings->setDefault("touch_punch_gesture", "short_tap");
 	settings->setDefault("clickable_chat_weblinks", "true");
 	// Altered settings for Android
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	settings->setDefault("screen_w", "0");
 	settings->setDefault("screen_h", "0");
 	settings->setDefault("performance_tradeoffs", "true");

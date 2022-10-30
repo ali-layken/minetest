@@ -13,14 +13,16 @@ and contributors (see source file comments and the version control log)
 Table of Contents
 ------------------
 
-1. [Further Documentation](#further-documentation)
-2. [Default Controls](#default-controls)
-3. [Paths](#paths)
-4. [Configuration File](#configuration-file)
-5. [Command-line Options](#command-line-options)
-6. [Compiling](#compiling)
-7. [Docker](#docker)
-8. [Version Scheme](#version-scheme)
+- [Minetest](#minetest)
+  - [Table of Contents](#table-of-contents)
+  - [Further documentation](#further-documentation)
+  - [Default controls](#default-controls)
+  - [Paths](#paths)
+  - [Configuration file](#configuration-file)
+  - [Command-line options](#command-line-options)
+  - [Compiling](#compiling)
+  - [Docker](#docker)
+  - [Version scheme](#version-scheme)
 
 
 Further documentation

@@ -24,7 +24,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gui/mainmenumanager.h"
 #include "gui/touchscreengui.h"
 #include "hud.h"
-
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
 void KeyCache::populate_nonchanging()
 {
 	key[KeyType::ESC] = EscapeKey;

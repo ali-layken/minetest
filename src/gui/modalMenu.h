@@ -18,7 +18,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #pragma once
-
+#ifndef __SWITCH__
+#define __SWITCH__
+#endif
+#ifndef HAVE_TOUCHSCREENGUI
+#define HAVE_TOUCHSCREENGUI
+#endif
 #include "irrlichttypes_extrabloated.h"
 #include "irr_ptr.h"
 #include "util/string.h"
@@ -90,7 +95,7 @@ protected:
 
 	v2u32 m_screensize_old;
 	float m_gui_scale;
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__SWITCH__)
 	std::string m_jni_field_name;
 #endif
 

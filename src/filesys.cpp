@@ -48,7 +48,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #else
 #define LAST_OS_ERROR() strerror(errno)
 #endif
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
 
+#undef _WIN32
 namespace fs
 {
 
@@ -376,46 +380,57 @@ bool IsDirDelimiter(char c)
 
 bool RecursiveDelete(const std::string &path)
 {
+#if !defined(__SWITCH__)
 	/*
-		Execute the 'rm' command directly, by fork() and execve()
-	*/
+			Execute the 'rm' command directly, by fork() and execve()
+		*/
 
-	infostream<<"Removing \""<<path<<"\""<<std::endl;
+	infostream << "Removing \"" << path << "\"" << std::endl;
 
-	pid_t child_pid = fork();
+	assert(IsPathAbsolute(path));
 
-	if(child_pid == 0)
+	const pid_t child_pid = fork();
+
+	if (child_pid == -1)
+	{
+		errorstream << "fork errno: " << errno << ": " << strerror(errno)
+					<< std::endl;
+		return false;
+	}
+
+	if (child_pid == 0)
 	{
 		// Child
-		const char *argv[4] = {
-#ifdef __ANDROID__
-			"/system/bin/rm",
-#else
-			"/bin/rm",
-#endif
+		std::array<const char *, 4> argv = {
+			"rm",
 			"-rf",
 			path.c_str(),
-			NULL
-		};
+			nullptr};
 
-		verbosestream<<"Executing '"<<argv[0]<<"' '"<<argv[1]<<"' '"
-				<<argv[2]<<"'"<<std::endl;
+		execvp(argv[0], const_cast<char **>(argv.data()));
 
-		execv(argv[0], const_cast<char**>(argv));
-
-		// Execv shouldn't return. Failed.
+		// note: use cerr because our logging won't flush in forked process
+		std::cerr << "exec errno: " << errno << ": " << strerror(errno)
+				  << std::endl;
 		_exit(1);
 	}
 	else
 	{
 		// Parent
-		int child_status;
+		int status;
 		pid_t tpid;
-		do{
-			tpid = wait(&child_status);
-		}while(tpid != child_pid);
-		return (child_status == 0);
+		do
+			tpid = waitpid(child_pid, &status, 0);
+		while (tpid != child_pid);
+		return WIFEXITED(status) && WEXITSTATUS(status) == 0;
 	}
+#else
+	Result ret = 0;
+	FsFileSystem *fs = fsdevGetDeviceFileSystem("sdmc");
+	if (R_FAILED(ret = fsFsDeleteDirectoryRecursively(fs, path.c_str())))
+		return false;
+	return true;
+#endif
 }
 
 bool DeleteSingleFileOrEmptyDirectory(const std::string &path)
@@ -835,9 +850,13 @@ std::string AbsolutePath(const std::string &path)
 #ifdef _WIN32
 	char *abs_path = _fullpath(NULL, path.c_str(), MAX_PATH);
 #else
+#if defined(__SWITCH__)
+	// TODO test
+	return path;
 	char *abs_path = realpath(path.c_str(), NULL);
 #endif
-	if (!abs_path) return "";
+	if (!abs_path)
+		return "";
 	std::string abs_path_str(abs_path);
 	free(abs_path);
 	return abs_path_str;

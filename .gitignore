@@ -44,6 +44,9 @@ build/.cmake/
 appimage-build
 AppDir
 
+.nro
+switch_out/
+
 ## Files related to Minetest development cycle
 /*.patch
 *.diff

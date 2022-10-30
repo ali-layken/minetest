@@ -1,0 +1,1 @@
+cp ./switch_out/minetest.nro /i/switch/minetest.nro

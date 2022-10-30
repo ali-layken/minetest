@@ -25,6 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "porting.h"
 
+#undef _WIN32
+
 #if defined(__FreeBSD__)  || defined(__NetBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
 	#include <sys/types.h>
 	#include <sys/sysctl.h>
@@ -624,7 +626,10 @@ static void createCacheDirTag()
 
 void initializePaths()
 {
-#if RUN_IN_PLACE
+#if defined(__SWITCH__)
+	path_share = "/switch/minetest/share";
+	path_user = "/switch/minetest";
+#elif RUN_IN_PLACE
 	infostream << "Using relative paths (RUN_IN_PLACE)" << std::endl;
 
 	char buf[BUFSIZ];
@@ -890,6 +895,13 @@ static bool open_uri(const std::string &uri)
 	const char *argv[] = {"open", uri.c_str(), NULL};
 	return posix_spawnp(NULL, "open", NULL, NULL, (char**)argv,
 		(*_NSGetEnviron())) == 0;
+
+#elif defined(__SWITCH__)
+	{
+		errorstream << "URI not supported"
+			    << uri << std::endl;
+		return false;
+	}
 #else
 	const char *argv[] = {"xdg-open", uri.c_str(), NULL};
 	return posix_spawnp(NULL, "xdg-open", NULL, NULL, (char**)argv, environ) == 0;
