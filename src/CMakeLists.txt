@@ -617,9 +617,18 @@ if(BUILD_CLIENT)
 		${ZSTD_LIBRARY}
 		${SDL2_LIBRARY}
 		${ZLIB_LIBRARIES}
-		${OPENGL_gl_LIBRARY}
-		${DRM_LIBRARY}
+	)
+	if(SWITCH)
+		target_link_libraries(
+			${PROJECT_NAME}
+			-lglad
+			${EGL_LIBRARY}
+		)
+	endif()
+	target_link_libraries(
+		${PROJECT_NAME}
 		${GLAPI_LIBRARY}
+		${DRM_LIBRARY}
 		${NX_LIBRARY}
 		${X11_LIBRARIES}
 		${OPENAL_LIBRARY}
@@ -908,7 +917,7 @@ else()
 	endif()
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -g")
 	set(CMAKE_CXX_FLAGS_SEMIDEBUG "-g -O1 ${WARNING_FLAGS} ${OTHER_FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 ${WARNING_FLAGS} ${OTHER_FLAGS}")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fno-inline ${WARNING_FLAGS} ${OTHER_FLAGS} ")
 
 	if(UNIX)
 		# enable assertions for libstdc++ or libc++

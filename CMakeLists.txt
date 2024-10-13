@@ -6,6 +6,11 @@ option(USE_SWITCH "Build targetting switch" ON)
 set(PROJECT_NAME_CAPITALIZED "Minetest")
 
 set(CMAKE_CXX_STANDARD 17)
+if(SWITCH)
+option(USE_SWITCH "Build targetting switch" ON)
+add_compile_definitions("__SWITCH__")
+endif()
+
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(GCC_MINIMUM_VERSION "7.5")
 set(CLANG_MINIMUM_VERSION "7.0.1")
@@ -72,9 +77,11 @@ set(PORTLIB_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include/")
 set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libSQLite.a")
 include(FindPkgConfig)
 
-find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
-  find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
-  find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+if(SWITCH)
+	find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
+	find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
+	find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+endif()
 
 include("/opt/devkitpro/portlibs/switch/lib/cmake/OpenAL/OpenALConfig.cmake")
 

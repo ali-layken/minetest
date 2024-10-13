@@ -64,10 +64,9 @@ extern "C" {
 #include <switch/runtime/nxlink.h>
 #include <switch/runtime/diag.h>
 #include <switch/services/ssl.h>
-#define Event libnx_Event
+#include <switch/services/nifm.h>
 #include <switch/services/set.h>
 #include <switch/runtime/pad.h>
-#undef Event
 #include <switch/runtime/devices/socket.h>
 }
 

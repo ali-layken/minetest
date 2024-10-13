@@ -11,7 +11,7 @@ console.log(
       child_process
         .execFileSync("C:/devkitPro/devkitA64/bin/aarch64-none-elf-addr2line.exe", [
           "-e",
-          "./src/minetest",
+          "./src/minetest.elf",
           "-f",
           "-p",
           "-C",

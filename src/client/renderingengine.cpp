@@ -479,95 +479,15 @@ float RenderingEngine::getDisplayDensity()
 {
 	float user_factor = g_settings->getFloat("display_density_factor", 0.5f, 5.0f);
 #ifndef __ANDROID__
-<<<<<<< HEAD
+#if defined(__SWITCH__)
+	return porting::getDisplayDensity() * user_factor;
+#else
 	float dpi = get_raw_device()->getDisplayDensity();
 	if (dpi == 0.0f)
 		dpi = 96.0f;
 	return std::max(dpi / 96.0f * user_factor, 0.5f);
-=======
-#if defined(XORG_USED)
-
-static float calcDisplayDensity()
-{
-	const char *current_display = getenv("DISPLAY");
-
-	if (current_display != NULL) {
-		Display *x11display = XOpenDisplay(current_display);
-
-		if (x11display != NULL) {
-			/* try x direct */
-			int dh = DisplayHeight(x11display, 0);
-			int dw = DisplayWidth(x11display, 0);
-			int dh_mm = DisplayHeightMM(x11display, 0);
-			int dw_mm = DisplayWidthMM(x11display, 0);
-			XCloseDisplay(x11display);
-
-			if (dh_mm != 0 && dw_mm != 0) {
-				float dpi_height = floor(dh / (dh_mm * 0.039370) + 0.5);
-				float dpi_width = floor(dw / (dw_mm * 0.039370) + 0.5);
-				return std::max(dpi_height, dpi_width) / 96.0;
-			}
-		}
-	}
-
-	/* return manually specified dpi */
-	return g_settings->getFloat("screen_dpi") / 96.0;
-}
-
-float RenderingEngine::getDisplayDensity()
-{
-	static float cached_display_density = calcDisplayDensity();
-	return std::max(cached_display_density * g_settings->getFloat("display_density_factor"), 0.5f);
-}
-
-#elif defined(_WIN32)
-
-
-static float calcDisplayDensity(irr::video::IVideoDriver *driver)
-{
-	HWND hWnd;
-	if (getWindowHandle(driver, hWnd)) {
-		HDC hdc = GetDC(hWnd);
-		float dpi = GetDeviceCaps(hdc, LOGPIXELSX);
-		ReleaseDC(hWnd, hdc);
-		return dpi / 96.0f;
-	}
-
-	/* return manually specified dpi */
-	return g_settings->getFloat("screen_dpi") / 96.0f;
-}
-
-float RenderingEngine::getDisplayDensity()
-{
-	static bool cached = false;
-	static float display_density;
-	if (!cached) {
-		display_density = calcDisplayDensity(get_video_driver());
-		cached = true;
-	}
-	return std::max(display_density * g_settings->getFloat("display_density_factor"), 0.5f);
-}
-
-#else
-
-float RenderingEngine::getDisplayDensity()
-{
-	return std::max(g_settings->getFloat("screen_dpi") / 96.0f *
-		g_settings->getFloat("display_density_factor"), 0.5f);
-}
-
-#endif
-
-<<<<<<< HEAD
-=======
-v2u32 RenderingEngine::getDisplaySize()
-{
-	return core::dimension2d<u32>(1280, 720);
-}
-
->>>>>>> 02e318d4e (squash)
->>>>>>> 89cb56f7a (squash)
-#else // __ANDROID__
+#endif	
+#else  // __ANDROID__
 	return porting::getDisplayDensity() * user_factor;
 #endif // __ANDROID__
 }
