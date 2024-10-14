@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 # This can be read from ${PROJECT_NAME} after project() is called
 project(minetest)
+option(USE_SWITCH "Build targetting switch" ON)
 set(PROJECT_NAME_CAPITALIZED "Minetest")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -62,6 +63,12 @@ if(WIN32)
 endif()
 set(RUN_IN_PLACE ${DEFAULT_RUN_IN_PLACE} CACHE BOOL
 	"Run directly in source directory structure")
+
+set(OPENGL_gl_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libglapi.a")
+set(SQLITE3_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include")
+set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib")
+
+include("/opt/devkitpro/portlibs/switch/lib/cmake/OpenAL/OpenALConfig.cmake")
 
 message(STATUS "*** Will build version ${VERSION_STRING} ***")
 message(STATUS "BUILD_CLIENT: " ${BUILD_CLIENT})
@@ -134,6 +141,8 @@ endif()
 
 # Installation
 
+set(DOCDIR "doc")
+set(EXAMPLE_CONF_DIR ${DOCDIR})
 if(WIN32)
 	set(SHAREDIR ".")
 	set(BINDIR "bin")

@@ -28,6 +28,10 @@ DEALINGS IN THE SOFTWARE.
 #include "log.h"
 #include "porting.h"
 
+#ifndef __SWITCH__
+#define __SWITCH__
+#endif
+
 // for setName
 #if defined(__linux__)
 	#include <sys/prctl.h>
@@ -331,7 +335,9 @@ bool Thread::setPriority(int prio)
 #ifdef _WIN32
 
 	return SetThreadPriority(win32_native_handle(), prio);
-
+#elif __SWITCH__
+	// svcSetThreadPriority(getThreadHandle(), prio);
+	return true;
 #else
 
 	struct sched_param sparam;

@@ -32,9 +32,26 @@ set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
 	"Choose the type of build. Options are: ${SUPPORTED_BUILD_TYPES}."
 	FORCE
 )
+
 if(NOT (CMAKE_BUILD_TYPE IN_LIST SUPPORTED_BUILD_TYPES))
 	message(WARNING
 			"Unknown CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}. Options are: ${SUPPORTED_BUILD_TYPES}.")
+endif()
+
+find_library(SDL2_LIBRARY NAMES SDL2 libSDL2)
+find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
+if (NOT SDL2_LIBRARY OR NOT SDL2_INCLUDEDIR)
+	message(FATAL_ERROR "SDL2 not found. "
+		"SDL2 is required to handle gamepad in MineTest.")
+else()
+	include_directories("${SDL2_INCLUDEDIR}")
+	MESSAGE(STATUS "Use system SDL2: ${SDL2_LIBRARY}")
+endif()
+# DirectFB. Necessary if system SDL2 is built with DirectFB support.
+find_path(DIRECTFB_INCLUDEDIR NAMES directfb.h directfb++.h PATH_SUFFIXES directfb include/directfb include PATHS)
+if (DIRECTFB_INCLUDEDIR)
+	include_directories("${DIRECTFB_INCLUDEDIR}")
+	message(STATUS "Adding DirectFB include directories for DirectFB support in SDL2")
 endif()
 
 
@@ -179,21 +196,8 @@ if(ENABLE_POSTGRESQL)
 	endif()
 endif(ENABLE_POSTGRESQL)
 
-option(ENABLE_LEVELDB "Enable LevelDB backend" TRUE)
+option(ENABLE_LEVELDB "Enable LevelDB backend" FALSE)
 set(USE_LEVELDB FALSE)
-
-if(ENABLE_LEVELDB)
-	find_library(LEVELDB_LIBRARY NAMES leveldb libleveldb)
-	find_path(LEVELDB_INCLUDE_DIR db.h PATH_SUFFIXES leveldb)
-	if(LEVELDB_LIBRARY AND LEVELDB_INCLUDE_DIR)
-		set(USE_LEVELDB TRUE)
-		message(STATUS "LevelDB backend enabled.")
-		include_directories(${LEVELDB_INCLUDE_DIR})
-	else()
-		message(STATUS "LevelDB not found!")
-	endif()
-endif(ENABLE_LEVELDB)
-
 
 OPTION(ENABLE_REDIS "Enable Redis backend" TRUE)
 set(USE_REDIS FALSE)
@@ -436,6 +440,7 @@ set(common_SRCS
 	pathfinder.cpp
 	player.cpp
 	porting.cpp
+	porting_switch.cpp
 	profiler.cpp
 	raycast.cpp
 	reflowscan.cpp

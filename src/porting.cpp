@@ -37,9 +37,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	#include <shellapi.h>
 	#include <mmsystem.h>
 #endif
+#if defined(__SWITCH__)
+#include "porting_switch.h"
+#endif
 #if !defined(_WIN32)
 	#include <unistd.h>
-	#include <sys/utsname.h>
+	#if !defined(__SWITCH__)
+		#include <sys/utsname.h>
+	#endif
 	#if !defined(__ANDROID__)
 		#include <spawn.h>
 	#endif
@@ -257,12 +262,8 @@ static std::string detectSystemInfo()
 	return oss.str();
 #elif defined(__ANDROID__)
 	std::ostringstream oss;
-	struct utsname osinfo;
-	uname(&osinfo);
-	int api = android_get_device_api_level();
-
-	oss << "Android/" << api << " " << osinfo.machine;
-	return oss.str();
+#elif defined(__SWITCH__)
+	return "Horizon";
 #else /* POSIX */
 	struct utsname osinfo;
 	uname(&osinfo);

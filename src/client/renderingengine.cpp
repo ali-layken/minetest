@@ -18,8 +18,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#ifndef  _SWITCH_
+#define _SWITCH_
+#undef _WIN32_
+#endif // !
 #include <optional>
 #include <irrlicht.h>
+
 #include "fontengine.h"
 #include "client.h"
 #include "clouds.h"
