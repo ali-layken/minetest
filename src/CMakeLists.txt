@@ -329,6 +329,7 @@ else()
 	set(PLATFORM_LIBS ${PLATFORM_LIBS} ${CMAKE_DL_LIBS})
 	if(SWITCH)
 		set(PLATFORM_LIBS ${PLATFORM_LIBS}  -lpthread -lz)
+	endif()
 	if(APPLE)
 		set(PLATFORM_LIBS "-framework CoreFoundation" ${PLATFORM_LIBS})
 	else()
@@ -599,7 +600,7 @@ endif()
 if(BUILD_CLIENT)
 	if(ANDROID)
 		add_library(${PROJECT_NAME} SHARED ${client_SRCS})
-	if(SWITCH)
+	elseif(SWITCH)
 		include(../cmake/FindEGL.cmake)
 		find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
 		find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
@@ -607,6 +608,7 @@ if(BUILD_CLIENT)
 		find_library(ZLIB_LIBRARY NAMES z libz REQUIRED)
 		find_library(PNG_LIBRARY NAMES png libpng REQUIRED)
 		find_library(BZ2_LIBRARY NAMES bz2 libbz2 REQUIRED)
+		add_executable(${PROJECT_NAME} ${client_SRCS} ${extra_windows_SRCS})
 	else()
 		add_executable(${PROJECT_NAME} ${client_SRCS} ${extra_windows_SRCS})
 	endif()
@@ -615,39 +617,50 @@ if(BUILD_CLIENT)
 		${PROJECT_NAME}
 		IrrlichtMt::IrrlichtMt
 		${ZSTD_LIBRARY}
-		${SDL2_LIBRARY}
 		${ZLIB_LIBRARIES}
 	)
-	if(SWITCH)
+	if(!SWITCH)
 		target_link_libraries(
 			${PROJECT_NAME}
+			${ZLIB_LIBRARIES}
+			IrrlichtMt::IrrlichtMt
+			${ZSTD_LIBRARY}
+			${SOUND_LIBRARIES}
+			${SQLITE3_LIBRARY}
+			${LUA_LIBRARY}
+			${GMP_LIBRARY}
+			${JSON_LIBRARY}
+			${LUA_BIT_LIBRARY}
+			sha256
+			${FREETYPE_LIBRARY}
+			${PLATFORM_LIBS}
+			# on Android, Minetest depends on SDL2 directly
+			# on other platforms, only IrrlichtMt depends on SDL2
+			"$<$<PLATFORM_ID:Android>:${SDL2_LIBRARIES}>"
+		)
+	else()
+		target_link_libraries(
+			${PROJECT_NAME}
+			IrrlichtMt::IrrlichtMt
+			${DRM_LIBRARY}
 			-lglad
 			${EGL_LIBRARY}
-		)
-	endif()
-	target_link_libraries(
-		${PROJECT_NAME}
-		${GLAPI_LIBRARY}
-		${DRM_LIBRARY}
-		${NX_LIBRARY}
-		${X11_LIBRARIES}
-		${OPENAL_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
-		${SOUND_LIBRARIES}
-		${SQLITE3_LIBRARY}
-		${LUA_LIBRARY}
-		${GMP_LIBRARY}
-		${JSON_LIBRARY}
-		${LUA_BIT_LIBRARY}
-		sha256
-		${FREETYPE_LIBRARY}
-		${PLATFORM_LIBS}
-		# on Android, Minetest depends on SDL2 directly
-		# on other platforms, only IrrlichtMt depends on SDL2
-		"$<$<PLATFORM_ID:Android>:${SDL2_LIBRARIES}>"
+			${GLAPI_LIBRARY}
+			${NX_LIBRARY}
+			${X11_LIBRARIES}
+			${ZSTD_LIBRARY}
+			${SOUND_LIBRARIES}
+			${SQLITE3_LIBRARY}
+			${LUA_LIBRARY}
+			${GMP_LIBRARY}
+			${JSON_LIBRARY}
+			${LUA_BIT_LIBRARY}
+			sha256
+			${FREETYPE_LIBRARY}
+			${PLATFORM_LIBS}
 	)
+	endif()
+	
 	if(NOT USE_LUAJIT)
 		set_target_properties(${PROJECT_NAME} PROPERTIES
 			# This is necessary for dynamic Lua modules

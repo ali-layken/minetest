@@ -2,6 +2,8 @@
 # "NSHighResolutionCapable" to true in "Info.plist".
 if(ANDROID)
 	set(DEFAULT_SDL2 ON)
+elseif(SWITCH)
+	set(DEFAULT_SDL2 ON)
 endif()
 
 option(USE_SDL2 "Use the SDL2 backend" ${DEFAULT_SDL2})
