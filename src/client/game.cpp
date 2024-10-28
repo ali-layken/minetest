@@ -1105,6 +1105,8 @@ bool Game::startup(bool *kill,
 	this->chat_backend        = chat_backend;
 	simple_singleplayer_mode  = start_data.isSinglePlayer();
 
+
+	dstream << "Game Start 1" << std::endl;
 	input->keycache.populate();
 
 	driver = device->getVideoDriver();
@@ -1113,6 +1115,7 @@ bool Game::startup(bool *kill,
 	driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, g_settings->getBool("mip_map"));
 
 	smgr->getParameters()->setAttribute(scene::OBJ_LOADER_IGNORE_MATERIAL_FILES, true);
+	dstream << "Game Start 2" << std::endl;
 
 	// Reinit runData
 	runData = GameRunData();
@@ -1125,16 +1128,20 @@ bool Game::startup(bool *kill,
 	m_touch_use_crosshair = g_settings->getBool("touch_use_crosshair");
 
 	g_client_translations->clear();
+	dstream << "Game Start 3" << std::endl;
 
 	// address can change if simple_singleplayer_mode
 	if (!init(start_data.world_spec.path, start_data.address,
 			start_data.socket_port, start_data.game_spec))
 		return false;
 
+	dstream << "Game Start 4" << std::endl;
 	if (!createClient(start_data))
 		return false;
+	dstream << "Game Start 5" << std::endl;
 
 	m_rendering_engine->initialize(client, hud);
+	dstream << "Game Start 6" << std::endl;
 
 	return true;
 }
@@ -1155,6 +1162,8 @@ void Game::run()
 		g_profiler->graphPop(dummyvalues);
 	}
 
+	dstream << "Game Run 1" << std::endl;
+
 	draw_times.reset();
 
 	set_light_table(g_settings->getFloat("display_gamma"));
@@ -1169,6 +1178,8 @@ void Game::run()
 	const bool initial_window_maximized = !g_settings->getBool("fullscreen") &&
 			g_settings->getBool("window_maximized");
 
+
+	dstream << "Game Run 2" << std::endl;
 	while (m_rendering_engine->run()
 			&& !(*kill || g_gamecallback->shutdown_requested
 			|| (server && server->isShutdownRequested()))) {
@@ -1384,6 +1395,7 @@ bool Game::initSound()
 bool Game::createSingleplayerServer(const std::string &map_dir,
 		const SubgameSpec &gamespec, u16 port)
 {
+	dstream << "Server cc " << std::endl;
 	showOverlayMessage(N_("Creating server..."), 0, 5);
 
 	std::string bind_str;
@@ -1413,13 +1425,17 @@ bool Game::createSingleplayerServer(const std::string &map_dir,
 		return false;
 	}
 
+	dstream << "Server cc1 " << std::endl;
 	server = new Server(map_dir, gamespec, simple_singleplayer_mode, bind_addr,
-			false, nullptr, error_message);
+						false, nullptr, error_message);
+	dstream << "Server cc3 " << std::endl;
 
-	auto start_thread = runInThread([=] {
+	auto start_thread = runInThread([=]
+									{
+	dstream << "Server cc 4" << std::endl;
 		server->start();
-		copyServerClientCache();
-	}, "ServerStart");
+		copyServerClientCache(); },
+									"ServerStart");
 
 	input->clear();
 	bool success = true;
@@ -1438,6 +1454,7 @@ bool Game::createSingleplayerServer(const std::string &map_dir,
 		else
 			showOverlayMessage(N_("Shutting down..."), dtime, 0, &m_shutdown_progress);
 	}
+	dstream << "Server Started " << success << std::endl;
 
 	start_thread->rethrow();
 
@@ -1452,6 +1469,7 @@ void Game::copyServerClientCache()
 	// remote servers.
 	// (Imagine that you launch a game once locally and then connect to a server.)
 
+	dstream << "Cp Server files" << std::endl;
 	assert(server);
 	auto map = server->getMediaList();
 	u32 n = 0;
@@ -1462,11 +1480,14 @@ void Game::copyServerClientCache()
 	}
 	infostream << "Copied " << n << " files directly from server to client cache"
 		<< std::endl;
+	dstream << "Copied " << n << " files directly from server to client cache"
+		<< std::endl;
 }
 
 bool Game::createClient(const GameStartData &start_data)
 {
 	showOverlayMessage(N_("Creating client..."), 0, 10);
+	dstream << "Create CLient 1" << std::endl;
 
 	draw_control = new MapDrawControl();
 	if (!draw_control)
@@ -1475,6 +1496,7 @@ bool Game::createClient(const GameStartData &start_data)
 	bool could_connect, connect_aborted;
 	if (!connectToServer(start_data, &could_connect, &connect_aborted))
 		return false;
+	dstream << "Create CLient 2" << std::endl;
 
 	if (!could_connect) {
 		if (error_message->empty() && !connect_aborted) {
@@ -1484,6 +1506,7 @@ bool Game::createClient(const GameStartData &start_data)
 		}
 		return false;
 	}
+	dstream << "Create CLient 3" << std::endl;
 
 	if (!getServerContent(&connect_aborted)) {
 		if (error_message->empty() && !connect_aborted) {
@@ -1493,6 +1516,7 @@ bool Game::createClient(const GameStartData &start_data)
 		}
 		return false;
 	}
+	dstream << "Create CLient 4" << std::endl;
 
 	auto *scsf = new GameGlobalShaderConstantSetterFactory(client);
 	shader_src->addShaderConstantSetterFactory(scsf);
@@ -1504,6 +1528,7 @@ bool Game::createClient(const GameStartData &start_data)
 
 	// Update cached textures, meshes and materials
 	client->afterContentReceived();
+	dstream << "Create CLient 5" << std::endl;
 
 	/* Camera
 	 */
@@ -1515,6 +1540,7 @@ bool Game::createClient(const GameStartData &start_data)
 	if (g_touchscreengui) {
 		g_touchscreengui->setUseCrosshair(!isTouchCrosshairDisabled());
 	}
+	dstream << "Create CLient 6" << std::endl;
 
 	/* Clouds
 	 */
@@ -1525,6 +1551,7 @@ bool Game::createClient(const GameStartData &start_data)
 	 */
 	sky = new Sky(-1, m_rendering_engine, texture_src, shader_src);
 	scsf->setSky(sky);
+	dstream << "Create CLient 7" << std::endl;
 
 	/* Pre-calculated values
 	 */
@@ -1535,6 +1562,7 @@ bool Game::createClient(const GameStartData &start_data)
 	} else {
 		crack_animation_length = 5;
 	}
+	dstream << "Create CLient 8" << std::endl;
 
 	if (!initGui())
 		return false;
@@ -1549,6 +1577,7 @@ bool Game::createClient(const GameStartData &start_data)
 	str += "] [";
 	str += driver_name;
 	str += "]";
+	dstream << "Create CLient 9" << std::endl;
 
 	device->setWindowCaption(utf8_to_wide(str).c_str());
 
@@ -1562,6 +1591,7 @@ bool Game::createClient(const GameStartData &start_data)
 
 	if (mapper && client->modsLoaded())
 		client->getScript()->on_minimap_ready(mapper);
+	dstream << "Create CLient 10" << std::endl;
 
 	return true;
 }
@@ -1593,6 +1623,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 	*connection_aborted = false;
 	bool local_server_mode = false;
 	const auto &address_name = start_data.address;
+	dstream << "Connect 1" << std::endl;
 
 	showOverlayMessage(N_("Resolving address..."), 0, 15);
 
@@ -1601,6 +1632,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 
 	try {
 		connect_address.Resolve(address_name.c_str(), &fallback_address);
+		dstream << "Connect 2" << std::endl;
 
 		if (connect_address.isAny()) {
 			// replace with localhost IP
@@ -1619,6 +1651,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 		errorstream << *error_message << std::endl;
 		return false;
 	}
+	dstream << "Connect 3" << std::endl;
 
 	// this shouldn't normally happen since Address::Resolve() checks for enable_ipv6
 	if (g_settings->getBool("enable_ipv6")) {
@@ -1630,6 +1663,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 	} else if (fallback_address.isIPv6()) {
 		fallback_address = Address();
 	}
+	dstream << "Connect 4" << std::endl;
 
 	fallback_address.setPort(connect_address.getPort());
 	if (fallback_address.isValid()) {
@@ -1641,6 +1675,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 			<< "\" isIPv6=" << connect_address.isIPv6() << std::endl;
 	}
 
+	dstream << "Connect 5" << std::endl;
 
 	try {
 		client = new Client(start_data.name.c_str(),
@@ -1654,6 +1689,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 		errorstream << *error_message << std::endl;
 		return false;
 	}
+	dstream << "Connect 6" << std::endl;
 
 	client->migrateModStorage();
 	client->m_simple_singleplayer_mode = simple_singleplayer_mode;
@@ -1663,7 +1699,8 @@ bool Game::connectToServer(const GameStartData &start_data,
 	*/
 
 	client->connect(connect_address, address_name,
-		simple_singleplayer_mode || local_server_mode);
+					simple_singleplayer_mode || local_server_mode);
+	dstream << "Connect 7" << std::endl;
 
 	try {
 		input->clear();
@@ -1727,6 +1764,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 		warningstream << "This should not happen. Please report a bug." << std::endl;
 		return false;
 	}
+	dstream << "Connect 8" << std::endl;
 
 	return true;
 }

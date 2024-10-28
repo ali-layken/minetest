@@ -106,6 +106,8 @@ bool UDPSocket::init(bool ipv6, bool noExceptions)
 			return false;
 		}
 
+		dstream << "Socket Handle " << m_handle << std::endl;
+
 		throw SocketException(std::string("Failed to create socket: error ") +
 				      SOCKET_ERR_STR(LAST_SOCKET_ERR()));
 	}
@@ -191,6 +193,8 @@ void UDPSocket::Send(const Address &destination, const void *data, int size)
 
 	if (destination.getFamily() != m_addr_family)
 		throw SendFailedException("Address family mismatch");
+
+	dstream << "Send to " << destination.serializeString() << std::endl;
 
 	int sent;
 	if (m_addr_family == AF_INET6) {

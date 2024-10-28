@@ -8,6 +8,10 @@
 
 #include <EGL/egl.h>
 
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
+
 #include "SIrrCreationParameters.h"
 #include "SExposedVideoData.h"
 #include "IContextManager.h"

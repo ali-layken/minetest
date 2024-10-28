@@ -34,7 +34,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #error Do not include in server builds
 #endif
 
-struct VideoDriverInfo {
+struct VideoDriverInfo
+{
 	std::string name;
 	std::string friendly_name;
 };
@@ -53,7 +54,8 @@ class RenderingCore;
 
 /* Helpers */
 
-struct FpsControl {
+struct FpsControl
+{
 	FpsControl() : last_time(0), busy_time(0), sleep_time(0) {}
 
 	void reset();
@@ -70,7 +72,7 @@ struct FpsControl {
 class FogShaderConstantSetterFactory : public IShaderConstantSetterFactory
 {
 public:
-	FogShaderConstantSetterFactory() {};
+	FogShaderConstantSetterFactory(){};
 	virtual IShaderConstantSetter *create();
 };
 
@@ -96,7 +98,7 @@ public:
 	bool setWindowIcon();
 	void cleanupMeshCache();
 
-	void removeMesh(const scene::IMesh* mesh);
+	void removeMesh(const scene::IMesh *mesh);
 
 	/**
 	 * This takes 3d_mode into account - side-by-side will return a
@@ -140,11 +142,11 @@ public:
 	// If "indef_pos" is given, the value of "percent" is ignored and an indefinite
 	// progress bar is drawn.
 	void draw_load_screen(const std::wstring &text,
-			gui::IGUIEnvironment *guienv, ITextureSource *tsrc,
-			float dtime = 0, int percent = 0, float *indef_pos = nullptr);
+						  gui::IGUIEnvironment *guienv, ITextureSource *tsrc,
+						  float dtime = 0, int percent = 0, float *indef_pos = nullptr);
 
 	void draw_scene(video::SColor skycolor, bool show_hud,
-			bool draw_wield_tool, bool draw_crosshair);
+					bool draw_wield_tool, bool draw_crosshair);
 
 	void initialize(Client *client, Hud *hud);
 	void finalize();
@@ -164,8 +166,8 @@ public:
 	static std::vector<irr::video::E_DRIVER_TYPE> getSupportedVideoDrivers();
 
 	static void autosaveScreensizeAndCo(
-			const irr::core::dimension2d<u32> initial_screen_size,
-			const bool initial_window_maximized);
+		const irr::core::dimension2d<u32> initial_screen_size,
+		const bool initial_window_maximized);
 
 private:
 	static void settingChangedCallback(const std::string &name, void *data);

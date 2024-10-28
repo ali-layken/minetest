@@ -24,10 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/numeric.h"
 #include "porting.h"
 #include "porting_switch.h"
-#include "threading/thread.h"
-#include "config.h"
-#include "filesys.h"
-#include "log.h"
+#include <switch.h>
 
 #include <sstream>
 #include <exception>
@@ -48,5 +45,30 @@ float getDisplayDensity()
 v2u32 getDisplaySize()
 {
 	return v2u32(1280, 720);
+}
+
+core::stringw showTextInputDialog(const std::string &hint, const std::string &current, int editType)
+{
+	char tmpoutstr[256] = {0};
+	wchar_t output[256] = {0};
+	Result rc = 0;
+	SwkbdConfig kbd;
+	rc = swkbdCreate(&kbd, 0);
+
+	if(editType == 3)
+	{
+		swkbdConfigMakePresetPassword(&kbd);
+	}
+	swkbdConfigSetGuideText(&kbd, hint.c_str());
+	swkbdConfigSetInitialText(&kbd, current.c_str());
+	rc = swkbdShow(&kbd, tmpoutstr, sizeof(tmpoutstr));
+	swkbdClose(&kbd);
+	mbstowcs(output, tmpoutstr, strlen(tmpoutstr));
+	return core::stringw(output);
+}
+
+bool hasPhysicalKeyboardSwitch()
+{
+	return false;
 }
 }

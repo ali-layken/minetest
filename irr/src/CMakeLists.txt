@@ -75,6 +75,10 @@ elseif(EMSCRIPTEN)
 elseif(SOLARIS)
 	add_definitions(-D_IRR_SOLARIS_PLATFORM_ -D_IRR_POSIX_API_)
 	set(DEVICE "X11")
+elseif(SWITCH)
+	add_definitions(-D__IRR_COMPILE_WITH_SDL_DEVICE_)
+	set(DEVICE "SDL")
+	set(EGL_LIBRARY ${EGL_LIBRARY}  -lglad -lSDL2)		
 else()
 	add_definitions(-D_IRR_POSIX_API_)
 	set(LINUX_PLATFORM TRUE)
@@ -285,6 +289,8 @@ endif()
 
 if(ANDROID)
 	enable_language(C)
+elseif(SWITCH)
+	set(SWITCH_INCLUDE_DIR, "/opt/devkitpro/portlibs/switch/include/")
 elseif(APPLE)
 	find_library(COCOA_LIB Cocoa REQUIRED)
 	find_library(IOKIT_LIB IOKit REQUIRED)
@@ -310,6 +316,7 @@ set(link_includes
 	${OPENGL_INCLUDE_DIR}
 	${OPENGLES2_INCLUDE_DIR}
 	${EGL_INCLUDE_DIR}
+	${SWITCH_INCLUDE_DIR}
 
 	"$<$<BOOL:${USE_X11}>:${X11_INCLUDE_DIR}>"
 )
@@ -355,6 +362,7 @@ set(IRRDRVROBJ
 if(ENABLE_OPENGL)
 	set(IRRDRVROBJ
 		${IRRDRVROBJ}
+		gl.c
 		COpenGLCacheHandler.cpp
 		COpenGLDriver.cpp
 		COpenGLSLMaterialRenderer.cpp

@@ -50,8 +50,10 @@ SQLite format specification:
 
 #define SQLRES(s, r, m) \
 	if ((s) != (r)) { \
+		auto error = sqlite3_errmsg(m_database); \
+		dstream << error << std::endl;				\
 		throw DatabaseException(std::string(m) + ": " +\
-				sqlite3_errmsg(m_database)); \
+				error); \
 	}
 #define SQLOK(s, m) SQLRES(s, SQLITE_OK, m)
 
@@ -113,18 +115,22 @@ int Database_SQLite3::busyHandler(void *data, int count)
 	return cur_time - first_time < BUSY_FATAL_TRESHOLD;
 }
 
+void errorLogCallback(void *pArg, int iErrCode, const char *zMsg){
+	dstream << zMsg << std::endl;
+}
 
 Database_SQLite3::Database_SQLite3(const std::string &savedir, const std::string &dbname) :
 	m_savedir(savedir),
 	m_dbname(dbname)
 {
+	sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, NULL);
 }
 
 void Database_SQLite3::beginSave()
 {
 	verifyDatabase();
 	SQLRES(sqlite3_step(m_stmt_begin), SQLITE_DONE,
-		"Failed to start SQLite3 transaction");
+		   "Failed to start SQLite3 transaction");
 	sqlite3_reset(m_stmt_begin);
 }
 
@@ -154,7 +160,13 @@ void Database_SQLite3::openDatabase()
 	bool needs_create = !fs::PathExists(dbp);
 
 	SQLOK(sqlite3_open_v2(dbp.c_str(), &m_database,
-			SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL),
+			SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 
+#ifndef __SWITCH__
+			NULL
+#else
+			"HOS_VFS"
+#endif
+			),
 		std::string("Failed to open SQLite3 database file ") + dbp);
 
 	SQLOK(sqlite3_busy_handler(m_database, Database_SQLite3::busyHandler,
@@ -163,9 +175,12 @@ void Database_SQLite3::openDatabase()
 	if (needs_create) {
 		createDatabase();
 	}
+	SQLOK(sqlite3_exec(m_database, "PRAGMA journal_mode=OFF;", NULL, NULL, NULL),
+		  "Failed to enable sqlite3 memory mode journal");
 
 	std::string query_str = std::string("PRAGMA synchronous = ")
-			 + itos(g_settings->getU16("sqlite_synchronous"));
+			 + itos(/*g_settings->getU16("sqlite_synchronous")*/0);
+
 	SQLOK(sqlite3_exec(m_database, query_str.c_str(), NULL, NULL, NULL),
 		"Failed to modify sqlite3 synchronous mode");
 	SQLOK(sqlite3_exec(m_database, "PRAGMA foreign_keys = ON", NULL, NULL, NULL),
@@ -224,6 +239,9 @@ void MapDatabaseSQLite3::createDatabase()
 			");\n",
 		NULL, NULL, NULL),
 		"Failed to create database table");
+
+	SQLOK(sqlite3_exec(m_database, "PRAGMA journal_mode=OFF;", NULL, NULL, NULL),
+		  "Failed to enable sqlite3 memory mode journal");
 }
 
 void MapDatabaseSQLite3::initStatements()
@@ -382,6 +400,8 @@ void PlayerDatabaseSQLite3::createDatabase()
 			"   FOREIGN KEY (`player`) REFERENCES player (`name`) ON DELETE CASCADE );",
 		NULL, NULL, NULL),
 		"Failed to create player inventory items table");
+	SQLOK(sqlite3_exec(m_database, "PRAGMA journal_mode=OFF;", NULL, NULL, NULL),
+		  "Failed to enable sqlite3 memory mode journal");
 }
 
 void PlayerDatabaseSQLite3::initStatements()
@@ -637,6 +657,8 @@ void AuthDatabaseSQLite3::createDatabase()
 		");",
 		NULL, NULL, NULL),
 		"Failed to create auth privileges table");
+	SQLOK(sqlite3_exec(m_database, "PRAGMA journal_mode=OFF;", NULL, NULL, NULL),
+		  "Failed to enable sqlite3 memory mode journal");
 }
 
 void AuthDatabaseSQLite3::initStatements()
@@ -788,6 +810,8 @@ void ModStorageDatabaseSQLite3::createDatabase()
 			");\n",
 		NULL, NULL, NULL),
 		"Failed to create database table");
+	SQLOK(sqlite3_exec(m_database, "PRAGMA journal_mode=OFF;", NULL, NULL, NULL),
+		  "Failed to enable sqlite3 memory mode journal");
 }
 
 void ModStorageDatabaseSQLite3::initStatements()
@@ -880,10 +904,13 @@ bool ModStorageDatabaseSQLite3::setModEntry(const std::string &modname,
 	SQLOK(sqlite3_bind_blob(m_stmt_set, 2, key.data(), key.size(), NULL),
 		"Internal error: failed to bind query at " __FILE__ ":" TOSTRING(__LINE__));
 	SQLOK(sqlite3_bind_blob(m_stmt_set, 3, value.data(), value.size(), NULL),
-		"Internal error: failed to bind query at " __FILE__ ":" TOSTRING(__LINE__));
+		  "Internal error: failed to bind query at " __FILE__ ":" TOSTRING(__LINE__));
+	dstream << "Db ab " << std::endl;
 	SQLRES(sqlite3_step(m_stmt_set), SQLITE_DONE, "Failed to set mod entry")
+	dstream << "Db ac ";
 
 	sqlite3_reset(m_stmt_set);
+	dstream << "Db ad ";
 
 	return true;
 }

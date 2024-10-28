@@ -35,6 +35,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	#define BYTE_ORDER 1234
 #elif defined(__MACH__) && defined(__APPLE__)
 	#include <machine/endian.h>
+#elif defined(__SWITCH__)
+	#include <machine/endian.h>
 #elif defined(__FreeBSD__) || defined(__DragonFly__)
 	#include <sys/endian.h>
 #elif HAVE_ENDIAN_H

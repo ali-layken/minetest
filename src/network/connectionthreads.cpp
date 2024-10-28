@@ -524,6 +524,9 @@ void ConnectionSendThread::connect(Address address)
 	dout_con << m_connection->getDesc() << " connecting to ";
 	address.print(dout_con);
 	dout_con << std::endl;
+	dstream << m_connection->getDesc() << " connecting to ";
+	address.print(dstream);
+	dstream << std::endl;
 
 	UDPPeer *peer = m_connection->createServerPeer(address);
 
@@ -654,7 +657,8 @@ void ConnectionSendThread::sendPackets(float dtime, u32 peer_packet_quota)
 	std::vector<session_t> pendingDisconnect;
 	std::map<session_t, bool> pending_unreliable;
 
-	for (session_t peerId : peerIds) {
+	for (session_t peerId : peerIds)
+	{
 		PeerHelper peer = m_connection->getPeerNoEx(peerId);
 		//peer may have been removed
 		if (!peer) {
@@ -666,6 +670,7 @@ void ConnectionSendThread::sendPackets(float dtime, u32 peer_packet_quota)
 		peer->m_increment_packets_remaining = peer_packet_quota;
 
 		UDPPeer *udpPeer = dynamic_cast<UDPPeer *>(&peer);
+		dstream << "Sending Packets p" << std::endl;
 
 		if (!udpPeer) {
 			continue;

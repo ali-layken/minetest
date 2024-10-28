@@ -51,8 +51,8 @@ void Server::handleCommand_Deprecated(NetworkPacket* pkt)
 
 void Server::handleCommand_Init(NetworkPacket* pkt)
 {
-
-	if(pkt->getSize() < 1)
+	dstream << "Received Init" << std::endl;
+	if (pkt->getSize() < 1)
 		return;
 
 	session_t peer_id = pkt->getPeerId();

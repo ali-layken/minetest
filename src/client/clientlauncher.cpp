@@ -201,6 +201,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 			guiroot = m_rendering_engine->get_gui_env()->addStaticText(L"",
 				core::rect<s32>(0, 0, 10000, 10000));
 
+			dstream << "Launch game" << std::endl;
 			bool should_run_game = launch_game(error_message, reconnect_requested,
 				start_data, cmd_args);
 
@@ -218,6 +219,7 @@ bool ClientLauncher::run(GameStartData &start_data, const Settings &cmd_args)
 				continue;
 			}
 
+			dstream << "Check Launch" << std::endl;
 			// Break out of menu-game loop to shut down cleanly
 			if (!m_rendering_engine->run() || *kill)
 				break;

@@ -45,6 +45,10 @@ bool CEGLManager::initialize(const SIrrlichtCreationParameters &params, const SE
 	EglWindow = (NativeWindowType)Data.OpenGLWin32.HWnd;
 	Data.OpenGLWin32.HDc = GetDC((HWND)EglWindow);
 	EglDisplay = eglGetDisplay((NativeDisplayType)Data.OpenGLWin32.HDc);
+#elif defined(__SWITCH__)
+	gladLoadGL();
+	EglWindow = (NativeWindowType)nwindowGetDefault();
+	EglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 #elif defined(_IRR_EMSCRIPTEN_PLATFORM_)
 	EglWindow = 0;
 	EglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
@@ -472,11 +476,12 @@ bool CEGLManager::generateContext()
 
 	EGLint ContextAttrib[] = {
 #ifdef EGL_VERSION_1_3
-			EGL_CONTEXT_CLIENT_VERSION, OpenGLESVersion,
+		EGL_CONTEXT_CLIENT_VERSION,
+		OpenGLESVersion,
 #endif
-			EGL_NONE, 0,
-		};
-
+		EGL_NONE,
+		0,
+	};
 	EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, ContextAttrib);
 
 	if (testEGLError()) {

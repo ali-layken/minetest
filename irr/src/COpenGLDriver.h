@@ -13,7 +13,6 @@ class CIrrDeviceLinux;
 class CIrrDeviceSDL;
 class CIrrDeviceMacOSX;
 }
-
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 
 #include "IMaterialRendererServices.h"

@@ -454,6 +454,8 @@ void Client::step(float dtime)
 			LocalPlayer *myplayer = m_env.getLocalPlayer();
 			FATAL_ERROR_IF(myplayer == NULL, "Local player not found in environment.");
 
+			m_con->EnsureServerPeer();
+
 			sendInit(myplayer->getName());
 		}
 
@@ -1145,6 +1147,7 @@ AuthMechanism Client::choseAuthMech(const u32 mechs)
 
 void Client::sendInit(const std::string &playerName)
 {
+	dstream << "Send Init" << std::endl;
 	NetworkPacket pkt(TOSERVER_INIT, 1 + 2 + 2 + (1 + playerName.size()));
 
 	// we don't support network compression yet
@@ -1161,6 +1164,8 @@ void Client::startAuth(AuthMechanism chosen_auth_mechanism)
 {
 	m_chosen_auth_mech = chosen_auth_mechanism;
 
+	dstream << "Client Start Auth" << std::endl;
+
 	std::string playername = m_env.getLocalPlayer()->getName();
 
 	switch (chosen_auth_mechanism) {
@@ -1174,6 +1179,7 @@ void Client::startAuth(AuthMechanism chosen_auth_mechanism)
 			NetworkPacket resp_pkt(TOSERVER_FIRST_SRP, 0);
 			resp_pkt << salt << verifier << (u8)((m_password.empty()) ? 1 : 0);
 
+			dstream << "Client Auth : First Srp" << std::endl;
 			Send(&resp_pkt);
 			break;
 		}
@@ -1200,6 +1206,7 @@ void Client::startAuth(AuthMechanism chosen_auth_mechanism)
 
 			NetworkPacket resp_pkt(TOSERVER_SRP_BYTES_A, 0);
 			resp_pkt << std::string(bytes_A, len_A) << based_on;
+			dstream << "Client Start SRP/LEgacy" << std::endl;
 			Send(&resp_pkt);
 			break;
 		}

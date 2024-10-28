@@ -18,25 +18,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #pragma once
-#ifndef __SWITCH__
-#define __SWITCH__
-#endif
-#ifndef HAVE_TOUCHSCREENGUI
-#define HAVE_TOUCHSCREENGUI
-#endif
+
 #include "irrlichttypes_extrabloated.h"
 #include "irr_ptr.h"
 #include "util/string.h"
 #ifdef __ANDROID__
-	#include <porting_android.h>
+#include <porting_android.h>
+#elif defined(__SWITCH__)
+#include <porting_switch.h>
 #endif
 
-enum class PointerType {
+enum class PointerType
+{
 	Mouse,
 	Touch,
 };
 
-struct PointerAction {
+struct PointerAction
+{
 	v2s32 pos;
 	u64 time; // ms
 
@@ -60,8 +59,8 @@ public:
 class GUIModalMenu : public gui::IGUIElement
 {
 public:
-	GUIModalMenu(gui::IGUIEnvironment* env, gui::IGUIElement* parent, s32 id,
-		IMenuManager *menumgr, bool remap_dbl_click = true);
+	GUIModalMenu(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
+				 IMenuManager *menumgr, bool remap_dbl_click = true);
 	virtual ~GUIModalMenu();
 
 	void allowFocusRemoval(bool allow);
@@ -75,11 +74,14 @@ public:
 	virtual bool OnEvent(const SEvent &event) { return false; };
 	virtual bool pausesGame() { return false; } // Used for pause menu
 #ifdef __ANDROID__
-	virtual void getAndroidUIInput() {};
+	virtual void getAndroidUIInput(){};
 	porting::AndroidDialogState getAndroidUIInputState();
 #endif
 
-	PointerType getPointerType() { return m_pointer_type; };
+	PointerType getPointerType()
+	{
+		return m_pointer_type;
+	};
 
 protected:
 	virtual std::wstring getLabelByID(s32 id) = 0;
@@ -91,15 +93,16 @@ protected:
 	// If the last input event was a mouse event, it's the cursor position.
 	// If the last input event was a touch event, it's the finger position.
 	v2s32 m_pointer;
-	v2s32 m_old_pointer;  // Mouse position after previous mouse event
+	v2s32 m_old_pointer; // Mouse position after previous mouse event
 
 	v2u32 m_screensize_old;
 	float m_gui_scale;
-#if defined(__ANDROID__) || defined(__SWITCH__)
+#ifdef __ANDROID__
 	std::string m_jni_field_name;
 #endif
 
-	struct ScalingInfo {
+	struct ScalingInfo
+	{
 		f32 scale;
 		core::rect<s32> rect;
 	};
@@ -131,7 +134,7 @@ private:
 	irr_ptr<gui::IGUIElement> m_touch_hovered;
 
 	// Converts touches into clicks.
-	bool simulateMouseEvent(ETOUCH_INPUT_EVENT touch_event, bool second_try=false);
+	bool simulateMouseEvent(ETOUCH_INPUT_EVENT touch_event, bool second_try = false);
 	void enter(gui::IGUIElement *element);
 	void leave();
 

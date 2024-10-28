@@ -271,6 +271,7 @@ public:
 	void Connect(Address address);
 	bool Connected();
 	void Disconnect();
+	void EnsureServerPeer();
 	bool ReceiveTimeoutMs(NetworkPacket *pkt, u32 timeout_ms);
 	void Receive(NetworkPacket *pkt);
 	bool TryReceive(NetworkPacket *pkt);
@@ -299,8 +300,8 @@ protected:
 
 	std::vector<session_t> getPeerIDs()
 	{
-		MutexAutoLock peerlock(m_peers_mutex);
-		return m_peer_ids;
+			MutexAutoLock peerlock(m_peers_mutex);
+			return m_peer_ids;
 	}
 
 	u32 getActiveCount();
@@ -338,6 +339,7 @@ private:
 	u32 m_bc_receive_timeout = 0;
 
 	bool m_shutting_down = false;
+	Address m_server_address;
 };
 
 } // namespace

@@ -1296,8 +1296,9 @@ Connection::Connection(u32 protocol_id, u32 max_packet_size, float timeout,
 
 	m_sendThread->start();
 	m_receiveThread->start();
-}
 
+	dstream << "Create Connection " << std::endl;
+}
 
 Connection::~Connection()
 {
@@ -1391,6 +1392,7 @@ bool Connection::deletePeer(session_t peer_id, bool timeout)
 			return false;
 		peer = m_peers[peer_id];
 		m_peers.erase(peer_id);
+		dstream << "Removing Peer" << std::endl;
 		auto it = std::find(m_peer_ids.begin(), m_peer_ids.end(), peer_id);
 		m_peer_ids.erase(it);
 	}
@@ -1429,6 +1431,16 @@ void Connection::Serve(Address bind_addr)
 void Connection::Connect(Address address)
 {
 	putCommand(ConnectionCommand::connect(address));
+}
+
+void Connection::EnsureServerPeer()
+{
+	auto peerIds = getPeerIDs();
+	if(peerIds.size() == 0)
+	{
+		dstream << "Ensuring Server Peer " << m_server_address.serializeString() << std::endl;
+		createServerPeer(m_server_address);
+	}
 }
 
 bool Connection::Connected()
@@ -1668,6 +1680,10 @@ void Connection::sendAck(session_t peer_id, u8 channelnum, u16 seqnum)
 
 UDPPeer* Connection::createServerPeer(const Address &address)
 {
+	dstream << "Creating Server Peer" << std::endl;
+
+	m_server_address = address;
+
 	if (ConnectedToServer())
 		throw ConnectionException("Already connected to a server");
 
@@ -1677,6 +1693,7 @@ UDPPeer* Connection::createServerPeer(const Address &address)
 	{
 		MutexAutoLock lock(m_peers_mutex);
 		m_peers[peer->id] = peer;
+		dstream << "Adding Server Peer" << std::endl;
 		m_peer_ids.push_back(peer->id);
 	}
 

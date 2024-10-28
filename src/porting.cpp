@@ -627,7 +627,7 @@ static void createCacheDirTag()
 void initializePaths()
 {
 #if defined(__SWITCH__)
-	path_share = "/switch/minetest/share";
+	path_share = "/switch/minetest";
 	path_user = "/switch/minetest";
 #elif RUN_IN_PLACE
 	infostream << "Using relative paths (RUN_IN_PLACE)" << std::endl;

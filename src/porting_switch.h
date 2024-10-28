@@ -23,12 +23,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #error this include has to be included on android port only!
 #endif
 
-
+#include "irrlichttypes_bloated.h"
 #include <string>
+#include "util/string.h"
 
 namespace porting {
 #ifndef SERVER
 float getDisplayDensity();
 v2u32 getDisplaySize();
+core::stringw showTextInputDialog(const std::string &hint, const std::string &current, int editType);
+bool hasPhysicalKeyboardSwitch();
 #endif
 }

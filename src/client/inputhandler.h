@@ -68,7 +68,8 @@ class KeyList : private std::list<KeyPress>
 		const_iterator f(begin());
 		const_iterator e(end());
 
-		while (f != e) {
+		while (f != e)
+		{
 			if (*f == key)
 				return f;
 
@@ -83,7 +84,8 @@ class KeyList : private std::list<KeyPress>
 		iterator f(begin());
 		iterator e(end());
 
-		while (f != e) {
+		while (f != e)
+		{
 			if (*f == key)
 				return f;
 
@@ -122,7 +124,8 @@ public:
 
 	void append(const KeyList &other)
 	{
-		for (const KeyPress &key : other) {
+		for (const KeyPress &key : other)
+		{
 			set(key);
 		}
 	}
@@ -333,7 +336,8 @@ public:
 	virtual v2s32 getMousePos()
 	{
 		auto control = RenderingEngine::get_raw_device()->getCursorControl();
-		if (control) {
+		if (control)
+		{
 			return control->getPosition();
 		}
 
@@ -343,9 +347,12 @@ public:
 	virtual void setMousePos(s32 x, s32 y)
 	{
 		auto control = RenderingEngine::get_raw_device()->getCursorControl();
-		if (control) {
+		if (control)
+		{
 			control->setPosition(x, y);
-		} else {
+		}
+		else
+		{
 			m_mousepos = v2s32(x, y);
 		}
 	}

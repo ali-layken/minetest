@@ -8,8 +8,14 @@
 
 #if defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && defined(IRR_PREFER_SDL_GL_HEADER)
 #include <SDL_video.h>
+#ifndef __SWITCH__
 #include <SDL_opengl.h>
 #else
+#include <switch.h>
+#include <glad/gl.h>
+#endif
+#else
+#include <GL/glext.h>
 #include "vendor/gl.h"
 #endif
 

@@ -51,5 +51,5 @@ public:
 private:
 	int m_handle = -1;
 	int m_timeout_ms = -1;
-	unsigned short m_addr_family = 0;
+	unsigned int m_addr_family = 0;
 };

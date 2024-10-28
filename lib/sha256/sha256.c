@@ -171,6 +171,47 @@
 #define htole32(x) LE_32(x)
 #define htobe32(x) BE_32(x)
 #endif
+
+#if defined(__SWITCH__)
+#include <machine/endian.h>
+//inline unsigned short bswap16(unsigned short x) { return (x << 8) | (x >> 8); }
+//inline unsigned int bswap32(unsigned int x) { return (x >> 24) | ((x & 0xFF0000) >> 8) | ((x & 0xFF00) << 8) | (x << 24); }
+//inline unsigned long long bswap64(unsigned long long x) { return ((unsigned long long)bswap32(x) << 32) | bswap32(x >> 32); }
+
+#if BYTE_ORDER == LITTLE_ENDIAN
+static inline uint16_t htole16(uint16_t x)
+{
+	return (uint16_t){x};
+}
+static inline uint16_t htobe16(uint16_t x) { return (uint16_t){__bswap16(x)}; }
+static inline uint32_t htole32(uint32_t x) { return (uint32_t){x}; }
+static inline uint32_t htobe32(uint32_t x) { return (uint32_t){__bswap32(x)}; }
+static inline uint64_t htole64(uint64_t x) { return (uint64_t){x}; }
+static inline uint64_t htobe64(uint64_t x) { return (uint64_t){__bswap64(x)}; }
+static inline uint16_t le16toh(uint16_t x) { return x; }
+static inline uint16_t be16toh(uint16_t x) { return __bswap16(x); }
+static inline uint32_t le32toh(uint32_t x) { return x; }
+static inline uint32_t be32toh(uint32_t x) { return __bswap32(x); }
+static inline uint64_t le64toh(uint64_t x) { return x; }
+static inline uint64_t be64toh(uint64_t x) { return __bswap64(x); }
+#else
+static inline uint16_t htole16(uint16_t x)
+{
+	return (uint16_t){__bswap16(x)};
+}
+static inline uint16_t htobe16(uint16_t x) { return (uint16_t){x}; }
+static inline uint32_t htole32(uint32_t x) { return (uint32_t){__bswap32(x)}; }
+static inline uint32_t htobe32(uint32_t x) { return (uint32_t){x}; }
+static inline uint64_t htole64(uint64_t x) { return (uint64_t){__bswap64(x)}; }
+static inline uint64_t htobe64(uint64_t x) { return (uint64_t){x}; }
+static inline uint16_t le16toh(uint16_t x) { return __bswap16(x.v); }
+static inline uint16_t be16toh(uint16_t x) { return x.v; }
+static inline uint32_t le32toh(uint32_t x) { return __bswap32(x.v); }
+static inline uint32_t be32toh(uint32_t x) { return x.v; }
+static inline uint64_t le64toh(uint64_t x) { return __bswap64(x.v); }
+static inline uint64_t be64toh(uint64_t x) { return x.v; }
+#endif
+#endif
 /** **/
 
 /** libcrypto/crypto_internal.h **/

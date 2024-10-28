@@ -40,6 +40,9 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters &params, io::IFil
 
 bool COpenGLDriver::initDriver()
 {
+#ifdef __SWITCH__
+	gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
+#endif
 	ContextManager->generateSurface();
 	ContextManager->generateContext();
 	ExposedData = ContextManager->getContext();

@@ -316,6 +316,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
 		SDL_SetHint(SDL_HINT_ENABLE_SCREEN_KEYBOARD, "0");
 #endif
 
+#ifdef __SWITCH__
+		SDL_SetHint(SDL_HINT_ENABLE_SCREEN_KEYBOARD, "0");
+#endif
+
 		// Minetest has its own signal handler
 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
@@ -400,6 +404,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
 //! destructor
 CIrrDeviceSDL::~CIrrDeviceSDL()
 {
+	os::Printer::log("Destroying Window", ELL_WARNING);
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 	const u32 numJoysticks = Joysticks.size();
 	for (u32 i = 0; i < numJoysticks; ++i)
@@ -580,21 +585,25 @@ bool CIrrDeviceSDL::createWindowWithContext()
 #else // !_IRR_EMSCRIPTEN_PLATFORM_
 	switch (CreationParams.DriverType) {
 	case video::EDT_OPENGL:
+		os::Printer::log("Creating GL 2.1", ELL_WARNING);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 		break;
 	case video::EDT_OPENGL3:
+		os::Printer::log("Creating GL 3.2", ELL_WARNING);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 		break;
 	case video::EDT_OGLES1:
+		os::Printer::log("Creating GL ES 1.1", ELL_WARNING);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		break;
 	case video::EDT_OGLES2:
 	case video::EDT_WEBGL1:
+		os::Printer::log("Creating GL ES 2.0", ELL_WARNING);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -981,7 +990,9 @@ bool CIrrDeviceSDL::run()
 		default:
 			break;
 		} // end switch
+#ifndef __SWITCH__
 		resetReceiveTextInputEvents();
+#endif
 	} // end while
 
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)

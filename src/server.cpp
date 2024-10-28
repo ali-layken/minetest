@@ -415,6 +415,7 @@ Server::~Server()
 
 void Server::init()
 {
+	dstream << "Server Start 1" << std::endl;
 	infostream << "Server created for gameid \"" << m_gamespec.id << "\"";
 	if (m_simple_singleplayer_mode)
 		infostream << " in simple singleplayer mode" << std::endl;
@@ -422,6 +423,7 @@ void Server::init()
 		infostream << std::endl;
 	infostream << "- world:  " << m_path_world << std::endl;
 	infostream << "- game:   " << m_gamespec.path << std::endl;
+	dstream << "Server Start 2" << std::endl;
 
 	m_game_settings = Settings::createLayer(SL_GAME);
 
@@ -434,15 +436,18 @@ void Server::init()
 		throw ServerError(std::string("Failed to initialize world: ") + e.what());
 	}
 
+	dstream << "Server Start 3" << std::endl;
 	// Create emerge manager
 	m_emerge = std::make_unique<EmergeManager>(this, m_metrics_backend.get());
 
 	// Create ban manager
 	std::string ban_path = m_path_world + DIR_DELIM "ipban.txt";
 	m_banmanager = new BanManager(ban_path);
+	dstream << "Server Start 4" << std::endl;
 
 	// Create mod storage database and begin a save for later
 	m_mod_storage_database = openModStorageDatabase(m_path_world);
+	dstream << "Server Start 5" << std::endl;
 	m_mod_storage_database->beginSave();
 
 	m_modmgr = std::make_unique<ServerModManager>(m_path_world);
@@ -452,6 +457,7 @@ void Server::init()
 		std::string error = m_modmgr->getUnsatisfiedModsError();
 		throw ServerError(error);
 	}
+	dstream << "Server Start 5" << std::endl;
 
 	//lock environment
 	MutexAutoLock envlock(m_env_mutex);
@@ -459,6 +465,7 @@ void Server::init()
 	// Create the Map (loads map_meta.txt, overriding configured mapgen params)
 	auto startup_server_map = std::make_unique<ServerMap>(m_path_world, this,
 			m_emerge.get(), m_metrics_backend.get());
+	dstream << "Server Start 6" << std::endl;
 
 	// Initialize scripting
 	infostream << "Server: Initializing Lua" << std::endl;
@@ -467,6 +474,7 @@ void Server::init()
 
 	// Must be created before mod loading because we have some inventory creation
 	m_inventory_mgr = std::make_unique<ServerInventoryManager>();
+	dstream << "Server Start 7" << std::endl;
 
 	m_script->loadBuiltin();
 
@@ -506,6 +514,7 @@ void Server::init()
 	m_env = new ServerEnvironment(std::move(startup_server_map),
 		this, m_metrics_backend.get());
 	m_env->init();
+	dstream << "Server Start 8" << std::endl;
 
 	m_inventory_mgr->setEnv(m_env);
 	m_clients.setEnv(m_env);
@@ -526,6 +535,7 @@ void Server::init()
 
 	// Do this after regular script init is done
 	m_script->initAsync();
+	dstream << "Server Start 9" << std::endl;
 
 	// Register us to receive map edit events
 	servermap.addEventReceiver(this);
@@ -538,6 +548,7 @@ void Server::init()
 	m_max_chatmessage_length = g_settings->getU16("chat_message_max_size");
 	m_csm_restriction_flags = g_settings->getU64("csm_restriction_flags");
 	m_csm_restriction_noderange = g_settings->getU32("csm_restriction_noderange");
+	dstream << "Server Start 10" << std::endl;
 }
 
 void Server::start()
@@ -579,6 +590,7 @@ void Server::start()
 			<< "\" listening on ";
 	m_bind_addr.print(actionstream);
 	actionstream << "." << std::endl;
+	dstream << "Server Init" << std::endl;
 }
 
 void Server::stop()
@@ -2881,6 +2893,7 @@ void Server::acceptAuth(session_t peer_id, bool forSudoMode)
 {
 	if (!forSudoMode) {
 		RemoteClient* client = getClient(peer_id, CS_Invalid);
+		dstream << "Send Auth" << std::endl;
 
 		NetworkPacket resp_pkt(TOCLIENT_AUTH_ACCEPT, 1 + 6 + 8 + 4, peer_id);
 
@@ -4187,6 +4200,8 @@ ModStorageDatabase *Server::openModStorageDatabase(const std::string &world_path
 
 	std::string backend = world_mt.exists("mod_storage_backend") ?
 		world_mt.get("mod_storage_backend") : "files";
+
+	dstream << "Server Backend " << backend << std::endl;
 	if (backend == "files")
 		warningstream << "/!\\ You are using the old mod storage files backend. "
 			<< "This backend is deprecated and may be removed in a future release /!\\"

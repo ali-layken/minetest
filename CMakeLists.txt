@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.12)
 
 # This can be read from ${PROJECT_NAME} after project() is called
 project(minetest)
-option(USE_SWITCH "Build targetting switch" ON)
 set(PROJECT_NAME_CAPITALIZED "Minetest")
+set(CMAKE_DEPENDS_USE_COMPILER FALSE)
+option(USE_SWITCH "Build targetting switch" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 if(SWITCH)
@@ -71,10 +72,8 @@ endif()
 set(RUN_IN_PLACE ${DEFAULT_RUN_IN_PLACE} CACHE BOOL
 	"Run directly in source directory structure")
 
-set(OPENGL_gl_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libglapi.a")
 set(SQLITE3_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include")
 set(PORTLIB_INCLUDE_DIR "/opt/devkitpro/portlibs/switch/include/")
-set(SQLITE3_LIBRARY "/opt/devkitpro/portlibs/switch/lib/libSQLite.a")
 include(FindPkgConfig)
 
 if(SWITCH)
