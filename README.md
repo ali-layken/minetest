@@ -124,6 +124,9 @@ Compiling
 - [Compiling on GNU/Linux](doc/compiling/linux.md)
 - [Compiling on Windows](doc/compiling/windows.md)
 - [Compiling on MacOS](doc/compiling/macos.md)
+- Compiling on Switch:
+
+`sudo dkp-pacman -S dkp-toolchain-vars switch-mesa switch-openal-soft libnx switch-cmake switch-tools switch-zlib switch-libjpeg-turbo switch-libpng switch-curl switch-freetype switch-libzstd libctru`
 
 Docker
 ------

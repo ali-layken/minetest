@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 # This can be read from ${PROJECT_NAME} after project() is called
 project(minetest)
 set(PROJECT_NAME_CAPITALIZED "Minetest")
-set(CMAKE_DEPENDS_USE_COMPILER FALSE)
+set(CMAKE_DEPENDS_USE_COMPILER TRUE)
 option(USE_SWITCH "Build targetting switch" ON)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -38,6 +38,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
 endif()
 
 set(WIN32 FALSE)
+set(UNIX FALSE)
 
 # Configuration options
 set(BUILD_CLIENT TRUE CACHE BOOL "Build client")
